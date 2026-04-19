@@ -134,11 +134,23 @@ export default function Home() {
           <div className="border border-gray-200 rounded-lg p-4">
             <p className="font-semibold text-black mb-2">Domain</p>
             {results.domain.results.map((d: any) => (
-              <div key={d.domain} className="flex justify-between items-center mb-1">
+              <div key={d.domain} className="flex justify-between items-center mb-2">
                 <span className="text-gray-600 text-sm">{d.domain}</span>
-                <span className={`font-medium text-sm ${d.available ? 'text-green-600' : 'text-red-600'}`}>
-                  {d.available ? '✅ Available' : '❌ Taken'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`font-medium text-sm ${d.available ? 'text-green-600' : 'text-red-600'}`}>
+                    {d.available ? '✅ Available' : '❌ Taken'}
+                  </span>
+                  {d.available && (
+                    
+                      href={`https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck=${d.domain}`}
+                      target={'_blank'}
+                      rel={'noopener noreferrer'}
+                      className="text-xs text-blue-500 underline"
+                    >
+                      Register →
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
