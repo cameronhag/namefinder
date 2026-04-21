@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: NextRequest) {
   try {
     const { type, email, message } = await req.json()
@@ -15,6 +13,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Message too long' }, { status: 400 })
     }
 
+    // Check API key at runtime (not at module load), so the build doesn't fail
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not set')
+      return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY)
+
     const typeLabel: Record<string, string> = {
       general: 'General feedback',
       bug: 'Bug report',
@@ -23,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     const { error } = await resend.emails.send({
       from: 'NameClaim Feedback <onboarding@resend.dev>',
-      to: 'haghighatcameron@gmail.com', // ← change this to wherever you want feedback to land
+      to: 'haghighatcameron@gmail.com', // ← your email
       replyTo: email || undefined,
       subject: `[NameClaim] ${typeLabel[type] || 'Feedback'}`,
       text: [
