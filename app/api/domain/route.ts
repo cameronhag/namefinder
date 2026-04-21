@@ -12,10 +12,12 @@ export async function GET(request: Request) {
   const key = process.env.GODADDY_API_KEY
   const secret = process.env.GODADDY_API_SECRET
 
-  const extensions = ['.com', '.io', '.co']
+  const coreExtensions = ['.com', '.io', '.co']
+  const extraExtensions = ['.app', '.dev', '.ai', '.tech', '.net', '.org', '.store', '.shop', '.biz', '.digital']
+  const allExtensions = [...coreExtensions, ...extraExtensions]
 
-  const results = await Promise.all(
-    extensions.map(async (ext) => {
+  const allResults = await Promise.all(
+    allExtensions.map(async (ext) => {
       const response = await fetch(
         `https://api.ote-godaddy.com/v1/domains/available?domain=${domain}${ext}`,
         {
@@ -29,9 +31,13 @@ export async function GET(request: Request) {
       return {
         domain: `${domain}${ext}`,
         available: data.available,
+        core: coreExtensions.includes(ext),
       }
     })
   )
 
-  return NextResponse.json({ results })
+  return NextResponse.json({
+    results: allResults.filter(d => d.core),
+    extra: allResults.filter(d => !d.core && d.available),
+  })
 }
