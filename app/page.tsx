@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import {
   Search, CheckCircle2, XCircle, Loader2, Globe, AtSign, Shield,
   Zap, Clock, DollarSign, ChevronRight, Sparkles, ArrowLeft,
-  AlertTriangle, ExternalLink, Share2, Linkedin, ChevronDown, Check,
+  AlertTriangle, ExternalLink, Share2, ChevronDown, Check,
   MessageSquare, Mail, X
 } from 'lucide-react'
 
