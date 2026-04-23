@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 import { PostHogProvider, usePostHog } from 'posthog-js/react'
 
+
 export function PHProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
@@ -14,6 +15,7 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
       person_profiles: 'identified_only',
       capture_pageview: false, // we capture manually for App Router SPA nav
       capture_pageleave: true,
+      autocapture: false,
     })
   }, [])
 
