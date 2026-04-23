@@ -7,6 +7,7 @@ import {
   AlertTriangle, ExternalLink, Share2, ChevronDown, Check,
   MessageSquare, Mail, X, Lock
 } from 'lucide-react'
+import posthog from 'posthog-js'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -248,7 +249,13 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
               {primaryAvail ? 'Available' : 'Taken'}
             </span>
             {primaryAvail && (
-              <a href={godaddyBase + primary.domain} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 underline">
+              <a
+                href={godaddyBase + primary.domain}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-500 underline"
+                onClick={() => posthog.capture('domain_register_clicked', { domain: primary.domain, tld: '.com' })}
+              >
                 Register →
               </a>
             )}
@@ -267,7 +274,13 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                   {d.available ? '✅ Available' : '❌ Taken'}
                 </span>
                 {d.available && (
-                  <a href={godaddyBase + d.domain} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 underline">
+                  <a
+                    href={godaddyBase + d.domain}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-500 underline"
+                    onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
+                  >
                     Register →
                   </a>
                 )}
@@ -286,7 +299,13 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
               <span className="font-mono text-gray-600">{d.domain}</span>
               <div className="flex items-center gap-2">
                 <span className="font-medium text-xs text-emerald-600">✅ Available</span>
-                <a href={godaddyBase + d.domain} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 underline">
+                <a
+                  href={godaddyBase + d.domain}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-500 underline"
+                  onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
+                >
                   Register →
                 </a>
               </div>
@@ -360,6 +379,7 @@ function TrademarkCard({ data }: { data: TrademarkApiResult }) {
             target="_blank"
             rel="noopener noreferrer"
             className="block rounded-lg border border-gray-200 bg-white p-3 hover:border-gray-300 hover:shadow-sm transition"
+            onClick={() => posthog.capture('trademark_conflict_opened', { name: data.name, conflicting_mark: primaryConflict.name })}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
@@ -514,6 +534,7 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
                     href={signupUrl}
                     target="_blank" rel="noopener noreferrer"
                     className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 transition-colors"
+                    onClick={() => posthog.capture('social_claim_clicked', { platform: s.platform.toLowerCase(), name: noSpaces })}
                   >
                     Claim Handle <ExternalLink className="h-3 w-3" />
                   </a>
@@ -672,6 +693,7 @@ function CategoryDropdown({
     } else if (e.key === 'Enter') {
       e.preventDefault()
       if (filtered[activeIndex]) {
+        posthog.capture('category_changed', { from: value, to: filtered[activeIndex] })
         onChange(filtered[activeIndex])
         setOpen(false)
       }
@@ -732,6 +754,7 @@ function CategoryDropdown({
                     aria-selected={selected}
                     onMouseEnter={() => setActiveIndex(idx)}
                     onClick={() => {
+                      posthog.capture('category_changed', { from: value, to: opt })
                       onChange(opt)
                       setOpen(false)
                     }}
@@ -792,19 +815,48 @@ export default function Home() {
     const validationError = validate(name)
     if (validationError) { setError(validationError); return }
 
+    const trimmedName = name.trim()
+    posthog.capture('search_performed', {
+      name: trimmedName,
+      name_length: trimmedName.length,
+      has_spaces: trimmedName.includes(' '),
+      category,
+    })
+
     setError('')
     setLoading(true)
     setShowMoreDomains(false)
 
-    const [domain, trademark, social] = await Promise.all([
-      fetch(`/api/domain?domain=${name}`).then(r => r.json()),
-      fetch(`/api/trademark?name=${name}`).then(r => r.json()),
-      fetch(`/api/social?name=${name}`).then(r => r.json()),
-    ])
+    try {
+      const [domain, trademark, social] = await Promise.all([
+        fetch(`/api/domain?domain=${name}`).then(r => r.json()),
+        fetch(`/api/trademark?name=${name}`).then(r => r.json()),
+        fetch(`/api/social?name=${name}`).then(r => r.json()),
+      ])
 
-    setResults({ domain, trademark, social })
-    setSearchedName(name)
-    setLoading(false)
+      setResults({ domain, trademark, social })
+      setSearchedName(name)
+
+      const socials: SocialEntry[] = social.results || []
+      const socialsAvailable = socials.filter(s => s.available)
+      posthog.capture('search_completed', {
+        name: trimmedName,
+        domain_available: domain.results?.[0]?.available ?? false,
+        trademark_status: trademark.conflict ? 'conflict' : 'clear',
+        instagram_available: socials.find(s => s.platform === 'Instagram')?.available ?? null,
+        tiktok_available: socials.find(s => s.platform === 'TikTok')?.available ?? null,
+        linkedin_available: socials.find(s => s.platform === 'LinkedIn')?.available ?? null,
+        num_socials_available: socialsAvailable.length,
+        overall_clean: (domain.results?.[0]?.available ?? false) && !trademark.conflict && socialsAvailable.length === 3,
+      })
+    } catch (err) {
+      posthog.capture('search_failed', {
+        name: trimmedName,
+        error_type: err instanceof Error ? err.message : 'unknown',
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -844,6 +896,7 @@ export default function Home() {
                     role="menuitem"
                     onClick={() => {
                       setSupportOpen(false)
+                      posthog.capture('feedback_opened', { from_page: 'results' })
                       setFeedbackOpen(true)
                     }}
                     className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -947,6 +1000,7 @@ export default function Home() {
                   role="menuitem"
                   onClick={() => {
                     setSupportOpen(false)
+                    posthog.capture('feedback_opened', { from_page: 'landing' })
                     setFeedbackOpen(true)
                   }}
                   className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -1207,6 +1261,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, email, message }),
       })
+      posthog.capture('feedback_submitted', { feedback_length: message.length })
       setSubmitted(true)
     } finally {
       setSubmitting(false)
