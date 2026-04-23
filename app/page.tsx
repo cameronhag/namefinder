@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import {
   Search, CheckCircle2, XCircle, Loader2, Globe, AtSign, Shield,
-  Zap, Clock, DollarSign, ChevronRight, Sparkles, ArrowLeft,
+  Zap, Clock, DollarSign, ChevronRight, Sparkles,
   AlertTriangle, ExternalLink, Share2, ChevronDown, Check,
-  MessageSquare, Mail, X
+  MessageSquare, Mail, X, Lock
 } from 'lucide-react'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -17,12 +17,37 @@ interface DomainApiResult {
   extra: DomainEntry[]
 }
 
-interface TrademarkApiResult {
-  conflict: boolean
-  totalConflicts: number
+interface TrademarkConflict {
+  name: string
+  status: string
+  owner: string
+  serialNumber: string
 }
 
-interface SocialEntry { platform: string; available: boolean; exact: boolean }
+interface TrademarkApiResult {
+  name: string
+  conflict: boolean
+  totalConflicts: number
+  similarCount: number
+  conflicts: TrademarkConflict[]
+}
+
+interface InstagramProfile {
+  username: string
+  fullName: string
+  biography: string
+  profilePicUrl: string
+  isPrivate: boolean
+  followerCount: number
+  postCount: number
+}
+
+interface SocialEntry {
+  platform: string
+  available: boolean
+  exact: boolean
+  profile?: InstagramProfile
+}
 
 interface SocialApiResult {
   results: SocialEntry[]
@@ -47,6 +72,17 @@ const categories = [
   'Other',
 ]
 
+const SIGNUP_URLS: Record<string, string> = {
+  Instagram: 'https://www.instagram.com/accounts/emailsignup/',
+  LinkedIn: 'https://www.linkedin.com/company/setup/new/',
+  TikTok: 'https://www.tiktok.com/signup',
+}
+
+function getSocialActionUrl(platform: string, profileUrl: string, available: boolean): string {
+  if (available) return SIGNUP_URLS[platform] ?? profileUrl
+  return profileUrl
+}
+
 // ─── Validation ───────────────────────────────────────────────────────────────
 
 function validate(value: string): string {
@@ -60,14 +96,10 @@ function validate(value: string): string {
 
 // ─── Score helper ─────────────────────────────────────────────────────────────
 
-function computeScore(results: Results): 'good' | 'not-ideal' | 'bad' {
-  const comAvailable = results.domain.results.find(d => d.domain.endsWith('.com'))?.available ?? false
-  const noTrademark = !results.trademark.conflict
-  const socialAvailCount = results.social.results.filter(s => s.available).length
-
-  if (noTrademark && comAvailable && socialAvailCount >= 1) return 'good'
-  if (!noTrademark && !comAvailable) return 'bad'
-  return 'not-ideal'
+function formatCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, '')}K`
+  return n.toString()
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -86,6 +118,14 @@ function TikTokIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  )
+}
+
+function LinkedInIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   )
 }
@@ -113,79 +153,77 @@ function AvailBadge({ available }: { available: boolean }) {
   )
 }
 
-// ─── Overall Score Card ───────────────────────────────────────────────────────
+// ─── Verdict ──────────────────────────────────────────────────────────────────
 
-const scoreConfig = {
-  good: {
-    icon: CheckCircle2,
-    title: 'Great Choice!',
-    description: 'This name has strong availability across platforms.',
-    bg: 'bg-emerald-50', border: 'border-emerald-200',
-    icon_: 'text-emerald-600', title_: 'text-emerald-900', desc_: 'text-emerald-700',
-  },
-  'not-ideal': {
-    icon: AlertTriangle,
-    title: 'Proceed with Caution',
-    description: 'Some conflicts exist. Review the details below.',
-    bg: 'bg-amber-50', border: 'border-amber-200',
-    icon_: 'text-amber-600', title_: 'text-amber-900', desc_: 'text-amber-700',
-  },
-  bad: {
-    icon: XCircle,
-    title: 'Not Recommended',
-    description: 'Significant conflicts found. Consider alternative names.',
-    bg: 'bg-red-50', border: 'border-red-200',
-    icon_: 'text-red-600', title_: 'text-red-900', desc_: 'text-red-700',
-  },
+type Verdict = 'green' | 'caution' | 'stop'
+
+function computeVerdict(
+  trademark: { conflict: boolean } | null,
+  domainComAvailable: boolean | null
+): { verdict: Verdict; headline: string; reason: string } {
+  if (trademark?.conflict) {
+    return {
+      verdict: 'stop',
+      headline: 'Not recommended',
+      reason: "There's a live trademark conflict. Using this name risks a cease-and-desist.",
+    }
+  }
+  if (domainComAvailable === false) {
+    return {
+      verdict: 'caution',
+      headline: 'Proceed with caution',
+      reason: "Trademark looks clear, but the .com is taken — your customers will get lost.",
+    }
+  }
+  if (trademark && !trademark.conflict && domainComAvailable) {
+    return {
+      verdict: 'green',
+      headline: 'Green light',
+      reason: 'No trademark conflicts and the .com is available. This name is yours to take.',
+    }
+  }
+  return {
+    verdict: 'caution',
+    headline: 'Still checking',
+    reason: 'Waiting on results…',
+  }
 }
 
-function OverallScoreCard({ name, results }: { name: string; results: Results }) {
-  const score = computeScore(results)
-  const cfg = scoreConfig[score]
-  const Icon = cfg.icon
-  const noSpaces = name.toLowerCase().replace(/\s+/g, '')
-
-  const items = [
-    { label: 'Trademark', available: !results.trademark.conflict },
-    { label: '.com domain', available: results.domain.results.find(d => d.domain.endsWith('.com'))?.available ?? false },
-    { label: 'Instagram', available: results.social.results.find(s => s.platform === 'Instagram')?.available ?? false },
-    { label: 'TikTok', available: results.social.results.find(s => s.platform === 'TikTok')?.available ?? false },
-  ]
-  const availCount = items.filter(i => i.available).length
-
+function VerdictHero({
+  trademark,
+  domainComAvailable,
+}: {
+  trademark: { conflict: boolean } | null
+  domainComAvailable: boolean | null
+}) {
+  const { verdict, headline, reason } = computeVerdict(trademark, domainComAvailable)
+  const styles = {
+    green: 'bg-green-50 border-green-200 text-green-900',
+    caution: 'bg-amber-50 border-amber-200 text-amber-900',
+    stop: 'bg-red-50 border-red-200 text-red-900',
+  }[verdict]
+  const dot = {
+    green: 'bg-green-500',
+    caution: 'bg-amber-500',
+    stop: 'bg-red-500',
+  }[verdict]
   return (
-    <div className={`${cfg.bg} ${cfg.border} border-2 rounded-xl p-6`}>
-      <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
-        <div className={`mb-4 rounded-full p-3 sm:mb-0 sm:mr-5 ${cfg.bg}`}>
-          <Icon className={`h-10 w-10 ${cfg.icon_}`} />
-        </div>
-        <div className="flex-1">
-          <h2 className={`mb-1 text-2xl font-bold ${cfg.title_}`}>{cfg.title}</h2>
-          <p className={`mb-4 text-base ${cfg.desc_}`}>{cfg.description}</p>
-          <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
-            {items.map(item => (
-              <span key={item.label} className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${item.available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
-                {item.available ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <XCircle className="mr-1 h-3 w-3" />}
-                {item.label}
-              </span>
-            ))}
-          </div>
-          <p className={`mt-4 text-sm font-medium ${cfg.desc_}`}>
-            {availCount} of {items.length} available for &ldquo;{name}&rdquo;
-          </p>
-        </div>
+    <div className={`rounded-2xl border p-6 mb-6 ${styles}`}>
+      <div className="flex items-center gap-3 mb-2">
+        <span className={`h-3 w-3 rounded-full ${dot}`} />
+        <h2 className="text-2xl font-semibold">{headline}</h2>
       </div>
+      <p className="text-sm opacity-80">{reason}</p>
     </div>
   )
 }
 
 // ─── Domain Card ─────────────────────────────────────────────────────────────
 
-function DomainCard({ results, showMore, onToggle }: { results: DomainApiResult; showMore: boolean; onToggle: () => void }) {
+function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { results: DomainApiResult; showMore: boolean; onToggle: () => void; hasTrademarkConflict?: boolean }) {
   const primary = results.results[0]
   const rest = results.results.slice(1)
   const primaryAvail = primary?.available ?? false
-  const noSpaces = primary?.domain.replace(/\.[^.]+$/, '') ?? ''
   const godaddyBase = 'https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck='
 
   return (
@@ -218,8 +256,8 @@ function DomainCard({ results, showMore, onToggle }: { results: DomainApiResult;
         </div>
       )}
 
-      {/* Other TLDs */}
-      {rest.length > 0 && (
+      {/* Other TLDs — hidden on trademark conflict since same-root variants inherit the problem */}
+      {!hasTrademarkConflict && rest.length > 0 && (
         <div className="space-y-2 mb-3">
           {rest.map(d => (
             <div key={d.domain} className="flex items-center justify-between text-sm">
@@ -239,8 +277,8 @@ function DomainCard({ results, showMore, onToggle }: { results: DomainApiResult;
         </div>
       )}
 
-      {/* Extra domains */}
-      {results.extra && results.extra.length > 0 && showMore && (
+      {/* Extra TLDs */}
+      {!hasTrademarkConflict && results.extra && results.extra.length > 0 && showMore && (
         <div className="mt-2 pt-2 border-t border-gray-100 space-y-2 mb-2">
           <p className="text-xs text-gray-400 mb-1">More available options</p>
           {results.extra.map(d => (
@@ -257,7 +295,7 @@ function DomainCard({ results, showMore, onToggle }: { results: DomainApiResult;
         </div>
       )}
 
-      {results.extra && results.extra.length > 0 && (
+      {!hasTrademarkConflict && results.extra && results.extra.length > 0 && (
         <button onClick={onToggle} className="text-xs text-gray-400 mt-1 underline">
           {showMore ? 'Show fewer domains ↑' : `Show ${results.extra.length} more available domains ↓`}
         </button>
@@ -268,8 +306,43 @@ function DomainCard({ results, showMore, onToggle }: { results: DomainApiResult;
 
 // ─── Trademark Card ───────────────────────────────────────────────────────────
 
-function TrademarkCard({ results }: { results: TrademarkApiResult }) {
-  const available = !results.conflict
+function TrademarkCard({ data }: { data: TrademarkApiResult }) {
+  if (!data.conflict) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between pb-3">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-gray-400" />
+            <span className="text-lg font-semibold text-gray-900">Trademark</span>
+          </div>
+          <AvailBadge available={true} />
+        </div>
+        <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+          <div className="flex items-center gap-2">
+            <Check className="h-5 w-5 text-green-600" />
+            <p className="font-[550] text-green-900">No conflicts found</p>
+          </div>
+          <a
+            href="https://www.uspto.gov/trademarks/apply"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-sm text-green-700 hover:text-green-800 underline"
+          >
+            File a trademark <ExternalLink className="h-3 w-3" />
+          </a>
+          {data.similarCount > 0 && (
+            <p className="mt-3 text-xs text-gray-500">
+              {data.similarCount}+ similar marks found (not exact matches)
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  const primaryConflict = data.conflicts[0]
+  const otherCount = Math.max(0, data.totalConflicts - 1) + data.similarCount
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between pb-3">
@@ -277,35 +350,35 @@ function TrademarkCard({ results }: { results: TrademarkApiResult }) {
           <Shield className="h-5 w-5 text-gray-400" />
           <span className="text-lg font-semibold text-gray-900">Trademark</span>
         </div>
-        <AvailBadge available={available} />
+        <AvailBadge available={false} />
       </div>
 
-      {available ? (
-        <div>
-          <p className="mb-4 text-sm text-gray-500">No conflicting trademarks found in the USPTO database. You can proceed with registration.</p>
+      <div className="space-y-3">
+        {primaryConflict && (
           <a
-            href="https://www.uspto.gov/trademarks/apply"
-            target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+            href={`https://tmsearch.uspto.gov/search/search-results/${primaryConflict.serialNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-lg border border-gray-200 bg-white p-3 hover:border-gray-300 hover:shadow-sm transition"
           >
-            File a trademark <ExternalLink className="h-3.5 w-3.5" />
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-[550] text-gray-900 truncate">{primaryConflict.name}</p>
+                <p className="text-sm text-gray-600 truncate">Owned by {primaryConflict.owner}</p>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  primaryConflict.status.toLowerCase().includes('live')
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {primaryConflict.status}
+              </span>
+            </div>
           </a>
-        </div>
-      ) : (
-        <div className="rounded-lg bg-red-50 p-4">
-          <p className="text-sm font-medium text-red-900 mb-1">Existing trademark conflicts found</p>
-          <p className="text-sm text-red-700">
-            {results.totalConflicts === 250 ? '250+' : results.totalConflicts} conflict{results.totalConflicts !== 1 ? 's' : ''} in USPTO database
-          </p>
-          <a
-            href="https://tmsearch.uspto.gov/"
-            target="_blank" rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors"
-          >
-            View full details <ExternalLink className="h-3.5 w-3.5" />
-          </a>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -318,6 +391,7 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
   const platformLinks: Record<string, string> = {
     Instagram: `https://www.instagram.com/${noSpaces}/`,
     TikTok: `https://www.tiktok.com/@${noSpaces}`,
+    LinkedIn: `https://www.linkedin.com/company/${noSpaces}`,
   }
 
   const platformIcons: Record<string, React.ReactNode> = {
@@ -331,9 +405,32 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
         <TikTokIcon className="h-4 w-4" />
       </div>
     ),
+    LinkedIn: (
+      <div className="rounded-lg p-1.5 text-white bg-[#0A66C2]">
+        <LinkedInIcon className="h-4 w-4" />
+      </div>
+    ),
   }
 
   const availCount = results.results.filter(s => s.available).length
+
+  // Lazy-load LinkedIn profile (API is slow; don't block initial results)
+  const [linkedinProfile, setLinkedinProfile] = useState<InstagramProfile | null>(null)
+  const [loadingLinkedinProfile, setLoadingLinkedinProfile] = useState(false)
+  const linkedinTaken = results.results.some(s => s.platform === 'LinkedIn' && !s.available && s.exact)
+
+  useEffect(() => {
+    if (!linkedinTaken) {
+      setLinkedinProfile(null)
+      return
+    }
+    setLoadingLinkedinProfile(true)
+    fetch(`/api/linkedin-profile?handle=${encodeURIComponent(noSpaces)}`)
+      .then(r => r.json())
+      .then(data => setLinkedinProfile(data.profile || null))
+      .catch(() => setLinkedinProfile(null))
+      .finally(() => setLoadingLinkedinProfile(false))
+  }, [linkedinTaken, noSpaces])
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -347,7 +444,11 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
 
       <div className="grid gap-4 sm:grid-cols-2">
         {results.results.map(s => {
-          const link = platformLinks[s.platform]
+          const profileUrl = platformLinks[s.platform]
+          const signupUrl = SIGNUP_URLS[s.platform] ?? profileUrl
+          const effectiveProfile = s.platform === 'LinkedIn' ? linkedinProfile : s.profile
+          const isLoadingProfile = s.platform === 'LinkedIn' && loadingLinkedinProfile
+
           return (
             <div key={s.platform} className={`rounded-lg border p-4 ${s.available ? 'bg-emerald-50' : 'bg-gray-50'}`}>
               <div className="mb-3 flex items-center justify-between">
@@ -355,56 +456,90 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
                   {platformIcons[s.platform] ?? <AtSign className="h-4 w-4" />}
                   <span className="font-medium text-gray-900">{s.platform}</span>
                 </div>
-                <StatusDot available={s.available} />
+                <AvailBadge available={s.available} />
               </div>
 
-              <div className="mb-3">
-                <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 ${s.available ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                  {s.available
-                    ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    : <XCircle className="h-3.5 w-3.5 text-red-600" />
-                  }
-                  <span className={`font-mono text-sm font-medium ${s.available ? 'text-emerald-800' : 'text-red-800'}`}>
-                    @{noSpaces}
-                  </span>
+              {!s.available && isLoadingProfile && !effectiveProfile && (
+                <div className="mb-3 flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3">
+                  <div className="h-12 w-12 shrink-0 animate-pulse rounded-full bg-gray-100" />
+                  <div className="min-w-0 flex-1 space-y-2 py-1">
+                    <div className="h-3 w-1/2 animate-pulse rounded bg-gray-100" />
+                    <div className="h-3 w-3/4 animate-pulse rounded bg-gray-100" />
+                    <div className="h-3 w-full animate-pulse rounded bg-gray-100" />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {!s.available && effectiveProfile && (
+                <a
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-3 flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:border-gray-300 hover:shadow-sm transition-all"
+                >
+                  {effectiveProfile.profilePicUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/api/image-proxy?url=${encodeURIComponent(effectiveProfile.profilePicUrl)}`}
+                      alt={effectiveProfile.fullName || effectiveProfile.username}
+                      referrerPolicy="no-referrer"
+                      className="h-12 w-12 shrink-0 rounded-full border border-gray-200 object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <div className="h-12 w-12 shrink-0 rounded-full border border-gray-200 bg-gray-100" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-sm font-medium text-gray-900">
+                        {effectiveProfile.fullName || effectiveProfile.username}
+                      </span>
+                      {effectiveProfile.isPrivate && <Lock className="h-3 w-3 shrink-0 text-gray-500" />}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {formatCount(effectiveProfile.followerCount)} followers · {formatCount(effectiveProfile.postCount)} {s.platform === 'LinkedIn' ? 'employees' : 'posts'}
+                    </div>
+                    {effectiveProfile.biography && (
+                      <div className={`text-xs text-gray-600 leading-snug ${s.platform === 'LinkedIn' ? 'whitespace-pre-line' : 'line-clamp-2'}`}>{effectiveProfile.biography}</div>
+                    )}
+                  </div>
+                </a>
+              )}
 
               {s.exact ? (
                 s.available ? (
                   <a
-                    href={link}
+                    href={signupUrl}
                     target="_blank" rel="noopener noreferrer"
                     className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-800 transition-colors"
                   >
                     Claim Handle <ExternalLink className="h-3 w-3" />
                   </a>
-                ) : (
+                ) : !effectiveProfile && !isLoadingProfile ? (
                   <a
-                    href={link}
+                    href={profileUrl}
                     target="_blank" rel="noopener noreferrer"
                     className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     View Profile <ExternalLink className="h-3 w-3" />
                   </a>
-                )
+                ) : null
               ) : (
                 <a
-                  href={link}
+                  href={profileUrl}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                 >
                   Check manually <ExternalLink className="h-3 w-3" />
                 </a>
               )}
+
             </div>
           )
         })}
       </div>
-
-      <p className="mt-4 text-xs text-gray-400">
-        Instagram and TikTok availability must be verified manually via the platform.
-      </p>
     </div>
   )
 }
@@ -412,51 +547,59 @@ function SocialCard({ results, name }: { results: SocialApiResult; name: string 
 // ─── Results View ─────────────────────────────────────────────────────────────
 
 function ResultsView({
-  name, results, onNewSearch, showMore, onToggleMore
+  name, category, results, showMore, onToggleMore,
 }: {
   name: string
+  category: string
   results: Results
-  onNewSearch: () => void
   showMore: boolean
   onToggleMore: () => void
 }) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <button
-        onClick={onNewSearch}
-        className="mb-6 -ml-2 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" /> New Search
-      </button>
-
       <h1 className="mb-8 text-3xl font-bold text-gray-900">
         Results for &ldquo;{name}&rdquo;
       </h1>
 
-      <div className="space-y-6">
-        <OverallScoreCard name={name} results={results} />
+      <div className="space-y-10">
+        <VerdictHero
+          trademark={results.trademark}
+          domainComAvailable={results.domain?.results?.find(d => d.domain.endsWith('.com'))?.available ?? null}
+        />
 
         <div className="grid gap-6 md:grid-cols-2">
-          <TrademarkCard results={results.trademark} />
-          <DomainCard results={results.domain} showMore={showMore} onToggle={onToggleMore} />
+          <TrademarkCard
+            data={results.trademark}
+          />
+          <DomainCard
+            results={results.domain}
+            showMore={showMore}
+            onToggle={onToggleMore}
+            hasTrademarkConflict={results.trademark.conflict}
+          />
         </div>
 
-        <SocialCard results={results.social} name={name} />
+        <SocialCard
+          results={results.social}
+          name={name}
+        />
       </div>
     </div>
   )
 }
 
-  function CategoryDropdown({
+function CategoryDropdown({
   value,
   onChange,
   options,
   isStacked,
+  compact = false,
 }: {
   value: string
   onChange: (v: string) => void
   options: readonly string[]
   isStacked: boolean
+  compact?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -546,11 +689,11 @@ function ResultsView({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
-        className="flex h-14 w-full items-center justify-between rounded-lg bg-gray-100 pl-4 pr-3 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
-      >
+        className={`flex w-full items-center justify-between gap-2 rounded-lg bg-gray-100 pl-4 pr-3 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black ${compact ? 'h-12 text-sm' : 'h-14'}`}
+        >
         <span className="whitespace-nowrap">{value}</span>
         <ChevronDown
-          className={`ml-2 h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -636,7 +779,7 @@ export default function Home() {
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [supportOpen]) 
+  }, [supportOpen])
 
   useEffect(() => {
     const check = () => setIsStacked(window.innerWidth < 640)
@@ -651,9 +794,7 @@ export default function Home() {
 
     setError('')
     setLoading(true)
-    setResults(null)
     setShowMoreDomains(false)
-    setSearchedName(name)
 
     const [domain, trademark, social] = await Promise.all([
       fetch(`/api/domain?domain=${name}`).then(r => r.json()),
@@ -662,6 +803,7 @@ export default function Home() {
     ])
 
     setResults({ domain, trademark, social })
+    setSearchedName(name)
     setLoading(false)
   }
 
@@ -672,23 +814,100 @@ export default function Home() {
   if (results) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="border-b border-gray-200 bg-white">
+        <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => { setResults(null); setName(''); setSearchedName('') }}
+              className="flex items-center gap-2"
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-semibold text-gray-900">NameClaim</span>
+            </button>
+            <div ref={supportRef} className="relative">
+              <button
+                onClick={() => setSupportOpen(o => !o)}
+                aria-haspopup="menu"
+                aria-expanded={supportOpen}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Support
+              </button>
+              {supportOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1 z-50"
+                >
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setSupportOpen(false)
+                      setFeedbackOpen(true)
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Give Feedback
+                  </button>
+                  <a
+                    role="menuitem"
+                    href="mailto:support@nameclaim.io"
+                    onClick={() => setSupportOpen(false)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Mail className="h-4 w-4" />
+                    Contact Us
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </header>
+        <div className="mx-auto max-w-4xl px-4 pt-8">
+          <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search another name..."
+                value={name}
+                onChange={e => { setName(e.target.value); setError('') }}
+                onKeyDown={handleKeyDown}
+                className="h-12 w-full rounded-lg bg-gray-100 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+            <CategoryDropdown
+              value={category}
+              onChange={setCategory}
+              options={categories}
+              isStacked={false}
+              compact
+            />
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-6 font-semibold text-white hover:bg-blue-700 disabled:opacity-60 transition-colors"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Checking...
+                </>
+              ) : 'Search'}
+            </button>
+          </div>
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        </div>
         <ResultsView
           name={searchedName}
+          category={category}
           results={results}
-          onNewSearch={() => { setResults(null); setName(''); setSearchedName('') }}
           showMore={showMoreDomains}
           onToggleMore={() => setShowMoreDomains(v => !v)}
         />
+        {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
       </div>
     )
   }
@@ -833,7 +1052,7 @@ export default function Home() {
             {[
               { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
               { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
-              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-blue-600', bgColor: 'bg-blue-100' },    
+              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
             ].map(item => (
               <div key={item.step} className="relative text-center">
                 <div className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold ${item.bgColor} ${item.textColor}`}>
@@ -989,8 +1208,6 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
         body: JSON.stringify({ type, email, message }),
       })
       setSubmitted(true)
-    } catch (err) {
-      console.error(err)
     } finally {
       setSubmitting(false)
     }
@@ -1034,7 +1251,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
               <select
                 value={type}
                 onChange={e => setType(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 px-3 py-2 text-sm focus:border-black focus:outline-none"
               >
                 <option value="general">General feedback</option>
                 <option value="bug">Bug report</option>
@@ -1048,7 +1265,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:outline-none"
               />
               <p className="mt-1 text-xs text-gray-500">Leave blank to submit anonymously.</p>
             </div>
@@ -1060,14 +1277,14 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
                 onChange={e => setMessage(e.target.value)}
                 rows={4}
                 placeholder="What's on your mind?"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none resize-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:outline-none resize-none"
               />
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
               >
                 Cancel
               </button>
