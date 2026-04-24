@@ -906,7 +906,7 @@ export default function Home() {
                   </button>
                   <a
                     role="menuitem"
-                    href="mailto:support@nameclaim.io"
+                    href="mailto:support@nameclaim.xyz"
                     onClick={() => setSupportOpen(false)}
                     className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                   >
