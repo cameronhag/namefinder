@@ -1224,7 +1224,7 @@ export default function Home() {
               <span className="text-lg font-semibold text-gray-900">NameClaim</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-gray-900">Privacy Policy</a>
+              <a href="/privacy" className="hover:text-gray-900">Privacy Policy</a>
               <a href="#" className="hover:text-gray-900">Terms of Service</a>
               <a href="#" className="hover:text-gray-900">Contact</a>
             </div>
