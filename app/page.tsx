@@ -1028,7 +1028,7 @@ export default function Home() {
         <div className="absolute inset-0" style={{background: 'radial-gradient(circle at 30% 20%, rgba(100, 220, 210, 0.13) 0%, rgba(120, 200, 230, 0.13) 30%, transparent 55%)'}} />
         <div className="relative mx-auto max-w-4xl text-center">
           <span className="mb-6 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
-            Trusted by 10,000+ entrepreneurs
+            Trusted by entrepreneurs
           </span>
           <h1 className="mb-6 text-balance text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
             Find the perfect name for your business
