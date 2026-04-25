@@ -253,7 +253,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                 href={godaddyBase + primary.domain}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-blue-500 underline"
+                className="text-xs text-[#297134] underline"
                 onClick={() => posthog.capture('domain_register_clicked', { domain: primary.domain, tld: '.com' })}
               >
                 Register →
@@ -278,7 +278,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                     href={godaddyBase + d.domain}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-500 underline"
+                    className="text-xs text-[#297134] underline"
                     onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
                   >
                     Register →
@@ -303,7 +303,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                   href={godaddyBase + d.domain}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-500 underline"
+                  className="text-xs text-[#297134] underline"
                   onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
                 >
                   Register →
@@ -866,14 +866,14 @@ export default function Home() {
   if (results) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <button
               type="button"
               onClick={() => { setResults(null); setName(''); setSearchedName('') }}
               className="flex items-center gap-2"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#297134]">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-semibold text-gray-900">NameClaim</span>
@@ -941,7 +941,7 @@ export default function Home() {
             <button
               onClick={handleSearch}
               disabled={loading}
-              className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-6 font-semibold text-white hover:bg-blue-700 disabled:opacity-60 transition-colors"
+              className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#297134] px-6 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
             >
               {loading ? (
                 <>
@@ -969,19 +969,14 @@ export default function Home() {
     <div className="min-h-screen bg-white">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#297134]">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-semibold text-gray-900">NameClaim</span>
           </div>
-          <nav className="hidden items-center justify-center gap-6 md:flex">
-            <a href="#how-it-works" onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">How It Works</a>
-            <a href="#features" onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Features</a>
-            <a href="#compare" onClick={e => { e.preventDefault(); document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Compare</a>
-          </nav>
           <div ref={supportRef} className="relative">
             <button
               onClick={() => setSupportOpen(o => !o)}
@@ -1024,14 +1019,13 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="relative bg-card px-6 min-h-[80vh] flex items-center justify-center">
-        <div className="absolute inset-0" style={{background: 'radial-gradient(circle at 30% 20%, rgba(100, 220, 210, 0.13) 0%, rgba(120, 200, 230, 0.13) 30%, transparent 55%)'}} />
+      <section className="relative bg-white px-6 min-h-[80vh] flex items-center justify-center">
         <div className="relative mx-auto max-w-4xl text-center">
-          <span className="mb-6 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
+          <span className="mb-6 inline-block rounded-full bg-[#E1E8E2] px-4 py-1.5 text-sm font-medium text-gray-800">
             Trusted by entrepreneurs
           </span>
-          <h1 className="mb-6 text-balance text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Find the perfect name for your business
+          <h1 className="mb-6 max-w-xl mx-auto text-center text-balance text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+            Make sure the name is yours to take
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg text-gray-500">
             Check if your business name is available across trademark, domain, and social media in one search.
@@ -1060,7 +1054,7 @@ export default function Home() {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-6 font-semibold text-white hover:bg-blue-700 disabled:opacity-60 transition-colors"
+                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#297134] px-6 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
               >
                 {loading ? (
                   <>
@@ -1104,9 +1098,9 @@ export default function Home() {
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {[
-              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
-              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
-              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-blue-600', bgColor: 'bg-blue-100' },
+              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
+              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
+              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
             ].map(item => (
               <div key={item.step} className="relative text-center">
                 <div className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold ${item.bgColor} ${item.textColor}`}>
@@ -1140,8 +1134,8 @@ export default function Home() {
               { icon: DollarSign, title: 'Save Money', desc: "Avoid rebranding costs by getting it right the first time. Know what's available before you commit." },
             ].map(f => (
               <div key={f.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                  <f.icon className="h-6 w-6 text-blue-700" />
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#297134]/10">
+                  <f.icon className="h-6 w-6 text-[#297134]" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">{f.title}</h3>
                 <p className="text-sm text-gray-500">{f.desc}</p>
@@ -1218,7 +1212,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#297134]">
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
               <span className="text-lg font-semibold text-gray-900">NameClaim</span>
