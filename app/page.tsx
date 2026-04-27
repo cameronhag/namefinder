@@ -8,6 +8,7 @@ import {
   MessageSquare, Mail, X, Lock
 } from 'lucide-react'
 import posthog from 'posthog-js'
+import { namecheapUrl } from '@/lib/affiliates'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -225,7 +226,6 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
   const primary = results.results[0]
   const rest = results.results.slice(1)
   const primaryAvail = primary?.available ?? false
-  const godaddyBase = 'https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck='
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -250,11 +250,16 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
             </span>
             {primaryAvail && (
               <a
-                href={godaddyBase + primary.domain}
+                href={namecheapUrl(primary.domain)}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener sponsored"
                 className="text-xs text-[#297134] underline"
-                onClick={() => posthog.capture('domain_register_clicked', { domain: primary.domain, tld: '.com' })}
+                onClick={() => posthog.capture('domain_register_clicked', {
+                  name: primary.domain,
+                  tld: primary.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
+                  affiliate_network: 'impact',
+                  sub_id: primary.domain,
+                })}
               >
                 Register →
               </a>
@@ -275,11 +280,16 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                 </span>
                 {d.available && (
                   <a
-                    href={godaddyBase + d.domain}
+                    href={namecheapUrl(d.domain)}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener sponsored"
                     className="text-xs text-[#297134] underline"
-                    onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
+                    onClick={() => posthog.capture('domain_register_clicked', {
+                      name: d.domain,
+                      tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
+                      affiliate_network: 'impact',
+                      sub_id: d.domain,
+                    })}
                   >
                     Register →
                   </a>
@@ -300,11 +310,16 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
               <div className="flex items-center gap-2">
                 <span className="font-medium text-xs text-emerald-600">✅ Available</span>
                 <a
-                  href={godaddyBase + d.domain}
+                  href={namecheapUrl(d.domain)}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener sponsored"
                   className="text-xs text-[#297134] underline"
-                  onClick={() => posthog.capture('domain_register_clicked', { domain: d.domain, tld: d.domain.match(/\.[^.]+$/)?.[0] ?? '' })}
+                  onClick={() => posthog.capture('domain_register_clicked', {
+                    name: d.domain,
+                    tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
+                    affiliate_network: 'impact',
+                    sub_id: d.domain,
+                  })}
                 >
                   Register →
                 </a>
