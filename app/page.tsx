@@ -8,8 +8,10 @@ import {
   AlertTriangle, ChevronDown, Check,
   MessageSquare, Mail,
 } from 'lucide-react'
+import Link from 'next/link'
 import posthog from 'posthog-js'
 import { nameToSlug } from '@/lib/slug'
+import { HOMEPAGE_EXAMPLES } from '@/lib/seed-names'
 import { BinocularsLogo } from '@/components/binoculars-logo'
 import { CategoryDropdown } from '@/components/category-dropdown'
 import { FeedbackModal } from '@/components/feedback-modal'
@@ -267,7 +269,18 @@ export default function Home() {
 
             {!loading && (
               <p className="mt-3 text-base text-black">
-                Try: &quot;Acme Solutions&quot;, &quot;TechFlow&quot;, &quot;GreenLeaf&quot;
+                Try:{' '}
+                {HOMEPAGE_EXAMPLES.map((example, i) => (
+                  <span key={example}>
+                    <Link
+                      href={`/check/${nameToSlug(example)}`}
+                      className="underline hover:text-gray-700 transition-colors"
+                    >
+                      &quot;{example}&quot;
+                    </Link>
+                    {i < HOMEPAGE_EXAMPLES.length - 1 && ', '}
+                  </span>
+                ))}
               </p>
             )}
           </div>
