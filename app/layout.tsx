@@ -35,21 +35,12 @@ export const metadata: Metadata = {
     description:
       'Trademark, domain, and social handle availability in one search. Free, ten seconds.',
     siteName: 'NameClaim',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'NameClaim — business name availability checker',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NameClaim — Claim a name no one can take from you',
     description:
       'Trademark, domain, and social handle availability in one search. Free, ten seconds.',
-    images: ['/og-image.png'],
   },
   alternates: {
     canonical: 'https://nameclaim.xyz',
