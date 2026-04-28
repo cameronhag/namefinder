@@ -278,45 +278,21 @@ export default function Home() {
       {/* Trust Bar */}
       <section className="border-y border-gray-200 bg-white px-6 py-10">
         <div className="mx-auto max-w-6xl">
-          <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
             Built on trusted data sources
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
-            <span className="inline-flex h-10 items-center justify-center rounded bg-[#1a3a6c] px-4 text-base font-bold uppercase tracking-wide text-white">
-              uspto
-            </span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://img.icons8.com/color/96/namecheap.png"
-              alt="Namecheap"
-              width={48}
-              height={48}
-              className="h-10 w-auto"
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://img.icons8.com/color/96/instagram-new.png"
-              alt="Instagram"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://img.icons8.com/color/96/tiktok.png"
-              alt="TikTok"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://img.icons8.com/color/96/linkedin.png"
-              alt="LinkedIn"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-            />
+          <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
+            {[
+              { title: 'USPTO', desc: 'Official trademark registry' },
+              { title: 'GoDaddy', desc: 'Live domain availability' },
+              { title: 'Instagram · TikTok', desc: 'Social handle checks' },
+              { title: 'LinkedIn', desc: 'Company page lookup' },
+            ].map(item => (
+              <div key={item.title} className="rounded-lg p-3">
+                <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                <p className="text-xs text-gray-500">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
