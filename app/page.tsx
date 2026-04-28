@@ -132,6 +132,15 @@ function LinkedInIcon({ className }: { className?: string }) {
   )
 }
 
+function BinocularsLogo({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 89 60" fill="currentColor" aria-hidden="true">
+      <path d="M12.3655 10.0973C18.3653 -0.702313 26.2496 -0.000330469 29.8655 0.597305C38.6653 2.19726 41.1987 10.2639 41.3655 14.0973C41.5321 19.2639 41.7655 31.5973 41.3655 39.5973C40.8655 49.5973 28.8655 64.5973 12.3655 57.0973C5.4187 53.9396 2.04424 48.7968 0.625241 43.7829C-1.51199 36.2303 2.21634 28.5921 5.97583 21.7018C7.80104 18.3566 9.96295 14.4219 12.3655 10.0973ZM20.7502 26.9996C14.1229 26.9996 8.75039 32.3724 8.75024 38.9996C8.75024 45.6271 14.1228 50.9996 20.7502 50.9996C27.3775 50.9995 32.7502 45.627 32.7502 38.9996C32.7501 32.3724 27.3775 26.9998 20.7502 26.9996Z" />
+      <path d="M75.9707 9.78801C69.9708 -1.01161 62.0866 -0.309626 58.4707 0.28801C49.6709 1.88797 47.1375 9.95456 46.9707 13.788C46.804 18.9546 46.5707 31.288 46.9707 39.288C47.4707 49.288 59.4707 64.288 75.9707 56.788C82.9175 53.6303 86.2919 48.4875 87.7109 43.4736C89.8482 35.921 86.1198 28.2828 82.3604 21.3925C80.5351 18.0473 78.3732 14.1126 75.9707 9.78801ZM67.5859 26.6904C74.2133 26.6904 79.5858 32.0631 79.5859 38.6904C79.5859 45.3178 74.2134 50.6904 67.5859 50.6904C60.9586 50.6902 55.5859 45.3177 55.5859 38.6904C55.5861 32.0631 60.9587 26.6905 67.5859 26.6904Z" />
+    </svg>
+  )
+}
+
 function StatusDot({ available }: { available: boolean }) {
   return (
     <span className="relative flex h-2.5 w-2.5">
@@ -253,7 +262,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                 href={namecheapUrl(primary.domain)}
                 target="_blank"
                 rel="noopener sponsored"
-                className="text-xs text-[#297134] underline"
+                className="text-xs text-[#236470] underline"
                 onClick={() => posthog.capture('domain_register_clicked', {
                   name: primary.domain,
                   tld: primary.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -283,7 +292,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                     href={namecheapUrl(d.domain)}
                     target="_blank"
                     rel="noopener sponsored"
-                    className="text-xs text-[#297134] underline"
+                    className="text-xs text-[#236470] underline"
                     onClick={() => posthog.capture('domain_register_clicked', {
                       name: d.domain,
                       tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -313,7 +322,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                   href={namecheapUrl(d.domain)}
                   target="_blank"
                   rel="noopener sponsored"
-                  className="text-xs text-[#297134] underline"
+                  className="text-xs text-[#236470] underline"
                   onClick={() => posthog.capture('domain_register_clicked', {
                     name: d.domain,
                     tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -726,7 +735,7 @@ function CategoryDropdown({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
-        className={`flex w-full items-center justify-between gap-2 rounded-lg bg-gray-100 pl-4 pr-3 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-black ${compact ? 'h-12 text-sm' : 'h-14'}`}
+        className={`flex w-full items-center justify-between gap-2 rounded-full pl-4 pr-3 font-semibold text-gray-900 transition-colors hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-black ${compact ? 'h-12 text-sm' : 'h-14'}`}
         >
         <span className="whitespace-nowrap">{value}</span>
         <ChevronDown
@@ -804,6 +813,12 @@ export default function Home() {
   // ── auto-sizing select ────────────────────────────────────────────────
   const [isStacked, setIsStacked] = useState(false)
 
+  // ── animated typing placeholder ───────────────────────────────────────
+  const [animatedPlaceholder, setAnimatedPlaceholder] = useState('')
+
+  // ── scroll-aware navbar (transparent at top, white when scrolled) ─────
+  const [scrolled, setScrolled] = useState(false)
+
   const [supportOpen, setSupportOpen] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const supportRef = useRef<HTMLDivElement>(null)
@@ -825,6 +840,50 @@ export default function Home() {
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Type out + cycle placeholder text on the landing page
+  useEffect(() => {
+    if (results) return
+    const phrases = ['Enter your business name', 'Acme Solutions', 'TechFlow', 'GreenLeaf']
+    let phraseIdx = 0
+    let charIdx = 0
+    let isDeleting = false
+    let timeout: ReturnType<typeof setTimeout>
+
+    const tick = () => {
+      const current = phrases[phraseIdx]
+      if (!isDeleting) {
+        if (charIdx < current.length) {
+          setAnimatedPlaceholder(current.slice(0, charIdx + 1))
+          charIdx++
+          timeout = setTimeout(tick, 75)
+        } else {
+          isDeleting = true
+          timeout = setTimeout(tick, 1800)
+        }
+      } else {
+        if (charIdx > 0) {
+          setAnimatedPlaceholder(current.slice(0, charIdx - 1))
+          charIdx--
+          timeout = setTimeout(tick, 35)
+        } else {
+          isDeleting = false
+          phraseIdx = (phraseIdx + 1) % phrases.length
+          timeout = setTimeout(tick, 400)
+        }
+      }
+    }
+
+    tick()
+    return () => clearTimeout(timeout)
+  }, [results])
 
   async function handleSearch() {
     const validationError = validate(name)
@@ -881,17 +940,15 @@ export default function Home() {
   if (results) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
             <button
               type="button"
               onClick={() => { setResults(null); setName(''); setSearchedName('') }}
               className="flex items-center gap-2"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#297134]">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-gray-900">NameClaim</span>
+              <BinocularsLogo className="h-8 w-auto text-black" />
+              <span className="text-2xl font-bold tracking-tight text-gray-900">nameclaim</span>
             </button>
             <div ref={supportRef} className="relative">
               <button
@@ -956,7 +1013,7 @@ export default function Home() {
             <button
               onClick={handleSearch}
               disabled={loading}
-              className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#297134] px-6 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
+              className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#236470] px-6 font-semibold text-white hover:bg-[#1a4d57] disabled:opacity-60 transition-colors"
             >
               {loading ? (
                 <>
@@ -984,80 +1041,103 @@ export default function Home() {
     <div className="min-h-screen bg-white">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <header
+        className={`sticky top-0 z-50 transition-colors duration-200 ${
+          scrolled
+            ? 'border-b border-gray-200 bg-white/95 backdrop-blur-sm'
+            : 'border-b border-transparent bg-transparent'
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#297134]">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900">NameClaim</span>
+            <BinocularsLogo className="h-6 w-auto text-black" />
+            <span className="text-2xl font-bold tracking-tight text-gray-900">nameclaim</span>
           </div>
-          <div ref={supportRef} className="relative">
-            <button
-              onClick={() => setSupportOpen(o => !o)}
-              aria-haspopup="menu"
-              aria-expanded={supportOpen}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Support
-            </button>
-            {supportOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1 z-50"
+          <nav className="hidden items-center justify-center gap-6 md:flex">
+            <a href="#how-it-works" onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
+            <a href="#features" onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+            <a href="#compare" onClick={e => { e.preventDefault(); document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Compare</a>
+            <a href="#use-cases" onClick={e => { e.preventDefault(); document.getElementById('use-cases')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Use Cases</a>
+            <a href="#faq" onClick={e => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+            <div ref={supportRef} className="relative">
+              <button
+                onClick={() => setSupportOpen(o => !o)}
+                aria-haspopup="menu"
+                aria-expanded={supportOpen}
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    setSupportOpen(false)
-                    posthog.capture('feedback_opened', { from_page: 'landing' })
-                    setFeedbackOpen(true)
-                  }}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                Support
+              </button>
+              {supportOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1 z-50"
                 >
-                  <MessageSquare className="h-4 w-4" />
-                  Give Feedback
-                </button>
-                <a
-                  role="menuitem"
-                  href="mailto:support@nameclaim.io"
-                  onClick={() => setSupportOpen(false)}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <Mail className="h-4 w-4" />
-                  Contact Us
-                </a>
-              </div>
-            )}
-          </div>
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setSupportOpen(false)
+                      posthog.capture('feedback_opened', { from_page: 'landing' })
+                      setFeedbackOpen(true)
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Give Feedback
+                  </button>
+                  <a
+                    role="menuitem"
+                    href="mailto:support@nameclaim.io"
+                    onClick={() => setSupportOpen(false)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Mail className="h-4 w-4" />
+                    Contact Us
+                  </a>
+                </div>
+              )}
+            </div>
+          </nav>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="rounded-full bg-[#236470] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1a4d57] transition-colors"
+          >
+            Sign Up
+          </button>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="relative bg-white px-6 min-h-[80vh] flex items-center justify-center">
+      <section
+        className="relative overflow-hidden px-6 pt-20 pb-24 sm:pt-24 sm:pb-32"
+        style={{
+          background:
+            'linear-gradient(180deg, #ffffff 0%, #B1D9ED 25%, #236470 100%)',
+        }}
+      >
         <div className="relative mx-auto max-w-4xl text-center">
-          <span className="mb-6 inline-block rounded-full bg-[#E1E8E2] px-4 py-1.5 text-sm font-medium text-gray-800">
-            Trusted by entrepreneurs
+          <span className="mb-6 inline-block rounded-full bg-[#f2f2f2]/40 px-4 py-1.5 text-sm font-medium text-gray-800">
+            Availability Checker
           </span>
-          <h1 className="mb-6 max-w-xl mx-auto text-center text-balance text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Make sure the name is yours to take
+          <h1 className="mb-6 text-balance text-2xl font-bold tracking-tight text-gray-900 md:text-4xl lg:text-5xl">
+            Claim a name no one can take from you
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg text-gray-500">
+          <p className="mx-auto mb-10 max-w-xl text-pretty text-lg text-black">
             Check if your business name is available across trademark, domain, and social media in one search.
           </p>
 
           {/* Search Form */}
           <div className="flex flex-col items-center gap-3 w-full">
-            <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-lg sm:flex-row">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <div className="flex flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-1 shadow-xl sm:flex-row sm:items-center sm:rounded-full sm:gap-1 sm:p-2 sm:pl-3 sm:pr-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Enter your business name..."
+                  placeholder={animatedPlaceholder || 'Enter your business name'}
                   value={name}
                   onChange={e => { setName(e.target.value); setError('') }}
                   onKeyDown={handleKeyDown}
-                  className="h-14 w-[400px] rounded-lg border-0 bg-gray-100 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="h-14 w-full rounded-full border-0 bg-transparent pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none sm:w-[320px]"
                 />
               </div>
               <CategoryDropdown
@@ -1069,7 +1149,7 @@ export default function Home() {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#297134] px-6 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
+                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#236470] px-7 font-semibold text-white hover:bg-[#1a4d57] disabled:opacity-60 transition-colors"
               >
                 {loading ? (
                   <>
@@ -1082,21 +1162,76 @@ export default function Home() {
               </button>
             </div>
 
-            {error && <p className="mt-2 text-left text-sm text-red-600">{error}</p>}
-
-            {loading && (
-              <div className="mt-4 flex flex-col gap-1 text-sm text-gray-400">
-                <p>🔍 Searching trademark database...</p>
-                <p>🌐 Checking domain availability...</p>
-                <p>📱 Looking up social handles...</p>
-              </div>
-            )}
+            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
             {!loading && (
-              <p className="mt-3 text-sm text-gray-400">
+              <p className="mt-3 text-base text-black">
                 Try: &quot;Acme Solutions&quot;, &quot;TechFlow&quot;, &quot;GreenLeaf&quot;
               </p>
             )}
+          </div>
+
+        </div>
+      </section>
+
+      {/* Trust Bar */}
+      <section className="border-y border-gray-200 bg-white px-6 py-10">
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+            Built on trusted data sources
+          </p>
+          <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
+            {[
+              { title: 'USPTO', desc: 'Official trademark registry' },
+              { title: 'GoDaddy', desc: 'Live domain availability' },
+              { title: 'Instagram · TikTok', desc: 'Social handle checks' },
+              { title: 'LinkedIn', desc: 'Company page lookup' },
+            ].map(item => (
+              <div key={item.title} className="rounded-lg p-3">
+                <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                <p className="text-xs text-gray-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cost of Error */}
+      <section className="bg-white px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-14 text-center">
+            <span className="mb-4 inline-block rounded-full bg-red-50 px-4 py-1.5 text-sm font-medium text-red-700">
+              The cost of getting this wrong
+            </span>
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">A wrong name can cost you everything you build</h2>
+            <p className="mx-auto max-w-2xl text-gray-500">Founders skip availability checks all the time — and it&apos;s usually a much bigger problem than they realize.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: AlertTriangle,
+                title: 'Cease & desist',
+                desc: 'A trademark conflict can force you to rebrand mid-launch — pulling listings, replacing assets, and notifying every customer.',
+              },
+              {
+                icon: DollarSign,
+                title: 'Rebrand costs add up fast',
+                desc: 'New domain purchases, redesigns, marketing reprints, and SEO recovery routinely run into five figures for early-stage startups.',
+              },
+              {
+                icon: Globe,
+                title: 'Customers can’t find you',
+                desc: 'If someone else owns the .com, your customers will land on their site — and your competitor will collect the traffic you paid for.',
+              },
+            ].map(item => (
+              <div key={item.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-50">
+                  <item.icon className="h-5 w-5 text-red-600" />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1113,9 +1248,9 @@ export default function Home() {
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {[
-              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
-              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
-              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
+              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
+              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
+              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
             ].map(item => (
               <div key={item.step} className="relative text-center">
                 <div className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold ${item.bgColor} ${item.textColor}`}>
@@ -1149,8 +1284,8 @@ export default function Home() {
               { icon: DollarSign, title: 'Save Money', desc: "Avoid rebranding costs by getting it right the first time. Know what's available before you commit." },
             ].map(f => (
               <div key={f.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#297134]/10">
-                  <f.icon className="h-6 w-6 text-[#297134]" />
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#236470]/10">
+                  <f.icon className="h-6 w-6 text-[#236470]" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">{f.title}</h3>
                 <p className="text-sm text-gray-500">{f.desc}</p>
@@ -1208,6 +1343,134 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Use Cases */}
+      <section id="use-cases" className="bg-white px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-14 text-center">
+            <span className="mb-4 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
+              Who it&apos;s for
+            </span>
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">Built for every kind of founder</h2>
+            <p className="mx-auto max-w-2xl text-gray-500">Whether you&apos;re launching your first idea or pitching your hundredth client.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: Sparkles,
+                title: 'First-time founders',
+                desc: 'Validate your idea before spending a dollar on incorporation, branding, or hosting. Skip the legal surprises.',
+              },
+              {
+                icon: Shield,
+                title: 'Agencies & studios',
+                desc: 'Run availability checks on client name candidates in seconds. Hand back a polished short-list with confidence.',
+              },
+              {
+                icon: Zap,
+                title: 'Indie hackers',
+                desc: 'Find a clean name and grab the domain in the same session. Stop losing momentum to research.',
+              },
+            ].map(item => (
+              <div key={item.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#236470]/10">
+                  <item.icon className="h-5 w-5 text-[#236470]" />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="bg-gray-50 px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-10 text-center">
+            <span className="mb-4 inline-block rounded-full bg-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600">
+              Pricing
+            </span>
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">Free, while we&apos;re early</h2>
+            <p className="mx-auto max-w-xl text-gray-500">No credit card. No signup. Every check NameClaim runs is free during launch.</p>
+          </div>
+          <div className="rounded-2xl border-2 border-[#236470] bg-white p-8 shadow-sm">
+            <div className="mb-6 flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-gray-900">$0</span>
+              <span className="text-gray-500">/ forever for early users</span>
+            </div>
+            <ul className="mb-6 space-y-3">
+              {[
+                'Unlimited business name searches',
+                'USPTO trademark conflict checks',
+                'Domain availability across 13 TLDs',
+                'Instagram, TikTok, and LinkedIn handle checks',
+                'Profile previews for taken handles',
+                'No account required',
+              ].map(line => (
+                <li key={line} className="flex items-start gap-2 text-sm text-gray-700">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#236470]" />
+                  {line}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#236470] px-6 py-3 font-semibold text-white hover:bg-[#1a4d57] transition-colors"
+            >
+              Start searching <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="bg-white px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-10 text-center">
+            <span className="mb-4 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
+              FAQ
+            </span>
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">Frequently asked questions</h2>
+          </div>
+          <div className="space-y-3">
+            {[
+              {
+                q: 'Where does the trademark data come from?',
+                a: 'NameClaim queries the USPTO trademark register for every search, returning live and similar marks that could conflict with the name you entered.',
+              },
+              {
+                q: 'How current is the data?',
+                a: 'Trademark and domain results are pulled in real time at search. Social handle checks reflect the platform state at the moment you searched.',
+              },
+              {
+                q: 'Do I need to create an account?',
+                a: 'No. NameClaim runs every search anonymously — no email, no signup, no password.',
+              },
+              {
+                q: 'Which domains and platforms do you check?',
+                a: 'We check 13 TLDs including .com, .io, .co, and .app, plus Instagram, TikTok, and LinkedIn for handle availability.',
+              },
+              {
+                q: 'Can NameClaim guarantee a name is safe to use?',
+                a: 'No tool can. We surface the most common conflicts so you can avoid obvious risks, but a clean NameClaim report is not legal advice — for active commercial use, talk to a trademark attorney.',
+              },
+              {
+                q: 'Is my search history stored?',
+                a: 'We log searches anonymously for product analytics. We do not link them to identifiable users and we do not sell data to third parties. See our Privacy Policy for details.',
+              },
+            ].map(item => (
+              <details key={item.q} className="group rounded-xl border border-gray-200 bg-white p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-gray-900">
+                  {item.q}
+                  <ChevronDown className="h-5 w-5 shrink-0 text-gray-400 transition-transform group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-sm text-gray-600">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-black px-6 py-20">
         <div className="mx-auto max-w-3xl text-center">
@@ -1227,10 +1490,8 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#297134]">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-lg font-semibold text-gray-900">NameClaim</span>
+              <BinocularsLogo className="h-5 w-auto text-black" />
+              <span className="text-lg font-bold tracking-tight text-gray-900">nameclaim</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-500">
               <a href="/privacy" className="hover:text-gray-900">Privacy Policy</a>

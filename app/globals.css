@@ -19,15 +19,13 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Crimson Text", ui-serif, Georgia, serif !important;
-  font-weight: 400 !important;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-figtree);
-  --font-serif: "Crimson Text", ui-serif, Georgia, serif;
 }
 
 select {
