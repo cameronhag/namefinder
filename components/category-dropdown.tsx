@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
-import { Search, ChevronDown, Check } from 'lucide-react'
+import { Search, ChevronDown, Check, X } from 'lucide-react'
 import posthog from 'posthog-js'
 
 export function CategoryDropdown({
@@ -21,10 +21,14 @@ export function CategoryDropdown({
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [placement, setPlacement] = useState<'top' | 'bottom'>('bottom')
+  const [sheetVisible, setSheetVisible] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const activeRef = useRef<HTMLLIElement>(null)
+  const touchStartY = useRef<number | null>(null)
+  const touchDeltaY = useRef(0)
+  const sheetPanelRef = useRef<HTMLDivElement>(null)
 
   const filtered = query
     ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
@@ -34,11 +38,11 @@ export function CategoryDropdown({
     if (open) {
       const idx = options.indexOf(value)
       setActiveIndex(Math.max(0, idx))
-      inputRef.current?.focus()
+      if (!isStacked) inputRef.current?.focus()
     } else {
       setQuery('')
     }
-  }, [open, options, value])
+  }, [open, options, value, isStacked])
 
   useEffect(() => {
     if (open) setActiveIndex(0)
@@ -49,7 +53,7 @@ export function CategoryDropdown({
   }, [activeIndex])
 
   useLayoutEffect(() => {
-    if (!open || !buttonRef.current) return
+    if (!open || !buttonRef.current || isStacked) return
     const rect = buttonRef.current.getBoundingClientRect()
     const spaceBelow = window.innerHeight - rect.bottom
     const spaceAbove = rect.top
@@ -57,10 +61,10 @@ export function CategoryDropdown({
     setPlacement(
       spaceBelow < MENU_MAX && spaceAbove > spaceBelow ? 'top' : 'bottom'
     )
-  }, [open])
+  }, [open, isStacked])
 
   useEffect(() => {
-    if (!open) return
+    if (!open || isStacked) return
     const handler = (e: MouseEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
         setOpen(false)
@@ -68,7 +72,61 @@ export function CategoryDropdown({
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [open])
+  }, [open, isStacked])
+
+  useEffect(() => {
+    if (!isStacked) return
+    if (open) {
+      const prevOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      requestAnimationFrame(() => setSheetVisible(true))
+      return () => {
+        document.body.style.overflow = prevOverflow
+      }
+    } else {
+      setSheetVisible(false)
+    }
+  }, [open, isStacked])
+
+  useEffect(() => {
+    if (!open || !isStacked) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [open, isStacked])
+
+  function selectOption(opt: string) {
+    posthog.capture('category_changed', { from: value, to: opt })
+    onChange(opt)
+    setOpen(false)
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartY.current = e.touches[0].clientY
+    touchDeltaY.current = 0
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (touchStartY.current === null) return
+    const dy = e.touches[0].clientY - touchStartY.current
+    if (dy > 0) {
+      touchDeltaY.current = dy
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transform = `translateY(${dy}px)`
+      }
+    }
+  }
+
+  function handleTouchEnd() {
+    if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transform = ''
+    }
+    if (touchDeltaY.current > 80) setOpen(false)
+    touchStartY.current = null
+    touchDeltaY.current = 0
+  }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') {
@@ -81,11 +139,7 @@ export function CategoryDropdown({
       setActiveIndex(i => Math.max(i - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (filtered[activeIndex]) {
-        posthog.capture('category_changed', { from: value, to: filtered[activeIndex] })
-        onChange(filtered[activeIndex])
-        setOpen(false)
-      }
+      if (filtered[activeIndex]) selectOption(filtered[activeIndex])
     }
   }
 
@@ -108,7 +162,7 @@ export function CategoryDropdown({
         />
       </button>
 
-      {open && (
+      {open && !isStacked && (
         <div
           className={`absolute left-0 z-50 min-w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl ring-1 ring-black/5 ${
             placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
@@ -142,11 +196,7 @@ export function CategoryDropdown({
                     role="option"
                     aria-selected={selected}
                     onMouseEnter={() => setActiveIndex(idx)}
-                    onClick={() => {
-                      posthog.capture('category_changed', { from: value, to: opt })
-                      onChange(opt)
-                      setOpen(false)
-                    }}
+                    onClick={() => selectOption(opt)}
                     className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors ${
                       active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
                     } ${selected ? 'font-medium' : ''}`}
@@ -158,6 +208,65 @@ export function CategoryDropdown({
               })
             )}
           </ul>
+        </div>
+      )}
+
+      {open && isStacked && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Select a category"
+          className="fixed inset-0 z-[60] flex flex-col justify-end"
+        >
+          <div
+            onClick={() => setOpen(false)}
+            className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${
+              sheetVisible ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          <div
+            ref={sheetPanelRef}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className={`relative z-[61] max-h-[85vh] rounded-t-2xl bg-white pb-[max(env(safe-area-inset-bottom),16px)] shadow-2xl transition-transform duration-200 ease-out ${
+              sheetVisible ? 'translate-y-0' : 'translate-y-full'
+            }`}
+          >
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="h-1.5 w-10 rounded-full bg-gray-300" />
+            </div>
+            <div className="flex items-center justify-between px-5 pt-2 pb-3">
+              <h2 className="text-base font-semibold text-gray-900">Select category</h2>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="-mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <ul role="listbox" className="max-h-[60vh] overflow-auto px-2 pb-2">
+              {options.map(opt => {
+                const selected = opt === value
+                return (
+                  <li
+                    key={opt}
+                    role="option"
+                    aria-selected={selected}
+                    onClick={() => selectOption(opt)}
+                    className={`flex min-h-[52px] cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-base transition-colors active:bg-gray-100 ${
+                      selected ? 'font-semibold text-gray-900' : 'text-gray-700'
+                    }`}
+                  >
+                    <span className="text-left">{opt}</span>
+                    {selected && <Check className="h-5 w-5 shrink-0 text-[#297134]" />}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </div>
       )}
     </div>
