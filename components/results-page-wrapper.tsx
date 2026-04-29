@@ -237,7 +237,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                 href={namecheapUrl(primary.domain)}
                 target="_blank"
                 rel="noopener sponsored"
-                className="text-xs text-[#236470] underline"
+                className="text-xs text-[#297134] underline"
                 onClick={() => posthog.capture('domain_register_clicked', {
                   name: primary.domain,
                   tld: primary.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -266,7 +266,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                     href={namecheapUrl(d.domain)}
                     target="_blank"
                     rel="noopener sponsored"
-                    className="text-xs text-[#236470] underline"
+                    className="text-xs text-[#297134] underline"
                     onClick={() => posthog.capture('domain_register_clicked', {
                       name: d.domain,
                       tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -295,7 +295,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                   href={namecheapUrl(d.domain)}
                   target="_blank"
                   rel="noopener sponsored"
-                  className="text-xs text-[#236470] underline"
+                  className="text-xs text-[#297134] underline"
                   onClick={() => posthog.capture('domain_register_clicked', {
                     name: d.domain,
                     tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -714,7 +714,7 @@ export default function ResultsPageWrapper({
             className="flex items-center gap-2"
           >
             <BinocularsLogo className="h-6 w-auto text-black" />
-            <span className="text-2xl font-bold tracking-tight text-gray-900">nameclaim</span>
+            <span className="text-2xl font-bold tracking-tight text-gray-900" style={{ fontFamily: 'var(--font-wordmark)' }}>nameclaim</span>
           </button>
           <div ref={supportRef} className="relative">
             <button
@@ -779,7 +779,7 @@ export default function ResultsPageWrapper({
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#236470] px-6 font-semibold text-white hover:bg-[#1a4d57] disabled:opacity-60 transition-colors"
+            className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#297134] px-6 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
           >
             {loading ? (
               <>
@@ -802,7 +802,7 @@ export default function ResultsPageWrapper({
           </p>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-lg bg-[#236470] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1a4d57] transition-colors"
+            className="inline-flex items-center justify-center rounded-lg bg-[#297134] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1f5527] transition-colors"
           >
             Back to search
           </a>

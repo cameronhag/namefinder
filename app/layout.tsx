@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Figtree } from "next/font/google";
+import { Figtree, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -8,6 +8,12 @@ import { PHProvider } from "./providers";
 const figtree = Figtree({
   variable: "--font-figtree",
   subsets: ["latin"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-wordmark",
+  subsets: ["latin"],
+  weight: ["700"],
 });
 
 export const metadata: Metadata = {
@@ -89,7 +95,7 @@ export default function RootLayout({
     <html
       lang="en"
       style={{ backgroundColor: 'white' }}
-      className={`${figtree.variable} h-full antialiased`}
+      className={`${figtree.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward" />

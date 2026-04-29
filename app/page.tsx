@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import {
   Search, CheckCircle2, XCircle, Loader2, Globe, AtSign, Shield,
   Zap, Clock, DollarSign, ChevronRight, Sparkles,
-  AlertTriangle, ChevronDown, Check,
+  AlertTriangle, ChevronDown, Check, Share2,
   MessageSquare, Mail,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -69,7 +69,7 @@ export default function Home() {
   }, [supportOpen])
 
   useEffect(() => {
-    const check = () => setIsStacked(window.innerWidth < 640)
+    const check = () => setIsStacked(window.innerWidth < 768)
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
@@ -154,7 +154,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <BinocularsLogo className="h-6 w-auto text-black" />
-            <span className="text-2xl font-bold tracking-tight text-gray-900">nameclaim</span>
+            <span className="text-2xl font-bold tracking-tight text-gray-900" style={{ fontFamily: 'var(--font-wordmark)' }}>nameclaim</span>
           </div>
           <nav className="hidden items-center justify-center gap-6 md:flex">
             <a href="#how-it-works" onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
@@ -203,7 +203,7 @@ export default function Home() {
           </nav>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="rounded-full bg-[#236470] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1a4d57] transition-colors"
+            className="rounded-full bg-[#297134] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1f5527] transition-colors"
           >
             Sign Up
           </button>
@@ -212,26 +212,38 @@ export default function Home() {
 
       {/* Hero */}
       <section
-        className="relative overflow-hidden px-6 pt-20 pb-24 sm:pt-24 sm:pb-32"
+        className="relative overflow-hidden px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 lg:pt-24 lg:pb-32"
         style={{
           background:
-            'linear-gradient(180deg, #ffffff 0%, #B1D9ED 25%, #236470 100%)',
+            'linear-gradient(180deg, #ffffff 0%, #B7DDC2 60%, #297134 100%)',
         }}
       >
         <div className="relative mx-auto max-w-4xl text-center">
-          <span className="mb-6 inline-block rounded-full bg-[#f2f2f2]/40 px-4 py-1.5 text-sm font-medium text-gray-800">
-            Availability Checker
+          <span className="mb-6 inline-block rounded-full bg-[#297234]/10 px-4 py-1.5 text-sm font-medium text-gray-800">
+            Business Name Availability Checker
           </span>
-          <h1 className="mb-6 text-balance text-2xl font-bold tracking-tight text-gray-900 md:text-4xl lg:text-5xl">
-            Claim a name no one can take from you
+          <h1 className="mx-auto mb-6 max-w-2xl text-balance text-5xl font-bold tracking-tight text-gray-900 md:text-6xl lg:text-6xl">
+            See if your business name is actually free
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-pretty text-lg text-black">
-            Check if your business name is available across trademark, domain, and social media in one search.
-          </p>
+          {/* Coverage pills */}
+          <div className="mb-10 flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700">
+              <Shield className="h-4 w-4 text-[#297134]" />
+              Trademark
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700">
+              <Globe className="h-4 w-4 text-[#297134]" />
+              Domain
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700">
+              <Share2 className="h-4 w-4 text-[#297134]" />
+              Social
+            </span>
+          </div>
 
           {/* Search Form */}
           <div className="flex flex-col items-center gap-3 w-full">
-            <div className="flex flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-1 shadow-xl sm:flex-row sm:items-center sm:rounded-full sm:gap-1 sm:p-2 sm:pl-3 sm:pr-2">
+            <div className="flex w-full flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-1 shadow-xl md:w-auto md:flex-row md:items-center md:rounded-full md:gap-1 md:p-2 md:pl-3 md:pr-2">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
@@ -240,7 +252,7 @@ export default function Home() {
                   value={name}
                   onChange={e => { setName(e.target.value); setError('') }}
                   onKeyDown={handleKeyDown}
-                  className="h-14 w-full rounded-full border-0 bg-transparent pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none sm:w-[320px]"
+                  className="h-14 w-full rounded-full border-0 bg-transparent pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none md:w-[280px]"
                 />
               </div>
               <CategoryDropdown
@@ -252,7 +264,7 @@ export default function Home() {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#236470] px-7 font-semibold text-white hover:bg-[#1a4d57] disabled:opacity-60 transition-colors"
+                className="inline-flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#297134] px-7 font-semibold text-white hover:bg-[#1f5527] disabled:opacity-60 transition-colors"
               >
                 {loading ? (
                   <>
@@ -260,7 +272,7 @@ export default function Home() {
                     Checking...
                   </>
                 ) : (
-                  <>Get Started <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle' }}>arrow_forward</span></>
+                  <>Check Name <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle' }}>arrow_forward</span></>
                 )}
               </button>
             </div>
@@ -268,20 +280,49 @@ export default function Home() {
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
             {!loading && (
-              <p className="mt-3 text-base text-black">
-                Try:{' '}
-                {HOMEPAGE_EXAMPLES.map((example, i) => (
-                  <span key={example}>
+              <div className="mt-3 flex w-full max-w-3xl flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-base font-medium text-white/80">Try</span>
+                  {HOMEPAGE_EXAMPLES.map(example => (
                     <Link
+                      key={example}
                       href={`/check/${nameToSlug(example)}`}
-                      className="underline hover:text-gray-700 transition-colors"
+                      className="rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
                     >
-                      &quot;{example}&quot;
+                      {example}
                     </Link>
-                    {i < HOMEPAGE_EXAMPLES.length - 1 && ', '}
+                  ))}
+                </div>
+                {/* Founders social proof */}
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-1">
+                    {[1, 2, 3, 4].map((i, idx, arr) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={`/founders/${i}.jpg`}
+                        alt=""
+                        width={22}
+                        height={22}
+                        className="h-[22px] w-[22px] rounded-full object-cover"
+                        style={
+                          idx < arr.length - 1
+                            ? {
+                                WebkitMaskImage:
+                                  'radial-gradient(circle 13px at calc(100% + 7px) center, transparent 100%, black 100%)',
+                                maskImage:
+                                  'radial-gradient(circle 13px at calc(100% + 7px) center, transparent 100%, black 100%)',
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-white">
+                    Used by founders like you
                   </span>
-                ))}
-              </p>
+                </div>
+              </div>
             )}
           </div>
 
@@ -311,9 +352,9 @@ export default function Home() {
       </section>
 
       {/* Cost of Error */}
-      <section className="bg-white px-6 py-20">
+      <section className="bg-white px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
+          <div className="mb-10 text-center md:mb-14">
             <span className="mb-4 inline-block rounded-full bg-red-50 px-4 py-1.5 text-sm font-medium text-red-700">
               The cost of getting this wrong
             </span>
@@ -351,9 +392,9 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="bg-gray-50 px-6 py-20">
+      <section id="how-it-works" className="bg-gray-50 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
+          <div className="mb-10 text-center md:mb-14">
             <span className="mb-4 inline-block rounded-full bg-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600">
               Simple Process
             </span>
@@ -362,9 +403,9 @@ export default function Home() {
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {[
-              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
-              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
-              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-[#236470]', bgColor: 'bg-[#236470]/10' },
+              { step: '01', title: 'Enter Your Name', desc: 'Type in your desired business name and select the relevant category for your industry.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
+              { step: '02', title: 'Instant Search', desc: 'We simultaneously check USPTO trademark databases, domain registrars, and major social platforms.', textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
+              { step: '03', title: 'Get Results', desc: "View a complete availability report showing what's available and what's taken across all platforms.", textColor: 'text-[#297134]', bgColor: 'bg-[#297134]/10' },
             ].map(item => (
               <div key={item.step} className="relative text-center">
                 <div className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold ${item.bgColor} ${item.textColor}`}>
@@ -379,9 +420,9 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-white px-6 py-20">
+      <section id="features" className="bg-white px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
+          <div className="mb-10 text-center md:mb-14">
             <span className="mb-4 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
               Why NameClaim
             </span>
@@ -398,8 +439,8 @@ export default function Home() {
               { icon: DollarSign, title: 'Save Money', desc: "Avoid rebranding costs by getting it right the first time. Know what's available before you commit." },
             ].map(f => (
               <div key={f.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#236470]/10">
-                  <f.icon className="h-6 w-6 text-[#236470]" />
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#297134]/10">
+                  <f.icon className="h-6 w-6 text-[#297134]" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">{f.title}</h3>
                 <p className="text-sm text-gray-500">{f.desc}</p>
@@ -410,22 +451,22 @@ export default function Home() {
       </section>
 
       {/* Comparison */}
-      <section id="compare" className="bg-gray-50 px-6 py-20">
+      <section id="compare" className="bg-gray-50 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-14 text-center">
+          <div className="mb-10 text-center md:mb-14">
             <span className="mb-4 inline-block rounded-full bg-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600">
               Comparison
             </span>
             <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">NameClaim vs Manual Search</h2>
             <p className="mx-auto max-w-2xl text-gray-500">See how much time and effort you save with NameClaim.</p>
           </div>
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table className="w-full min-w-[520px]">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Feature</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">NameClaim</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-500">Manual Search</th>
+                  <th className="px-3 py-3 text-left text-sm font-semibold text-gray-900 sm:px-6 sm:py-4">Feature</th>
+                  <th className="px-3 py-3 text-center text-sm font-semibold text-gray-900 sm:px-6 sm:py-4">NameClaim</th>
+                  <th className="px-3 py-3 text-center text-sm font-semibold text-gray-500 sm:px-6 sm:py-4">Manual Search</th>
                 </tr>
               </thead>
               <tbody>
@@ -438,13 +479,13 @@ export default function Home() {
                   { feature: 'Instant availability score', nc: true, m: false },
                 ].map((row, i) => (
                   <tr key={row.feature} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                    <td className="px-6 py-4 text-sm text-gray-900">{row.feature}</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-3 py-3 text-sm text-gray-900 sm:px-6 sm:py-4">{row.feature}</td>
+                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
                       {typeof row.nc === 'boolean'
                         ? row.nc ? <CheckCircle2 className="mx-auto h-5 w-5 text-emerald-600" /> : <XCircle className="mx-auto h-5 w-5 text-red-500" />
                         : <span className="font-medium text-gray-900">{row.nc}</span>}
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
                       {typeof row.m === 'boolean'
                         ? row.m ? <CheckCircle2 className="mx-auto h-5 w-5 text-emerald-600" /> : <XCircle className="mx-auto h-5 w-5 text-red-500" />
                         : <span className="text-sm text-gray-500">{row.m}</span>}
@@ -458,9 +499,9 @@ export default function Home() {
       </section>
 
       {/* Use Cases */}
-      <section id="use-cases" className="bg-white px-6 py-20">
+      <section id="use-cases" className="bg-white px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
+          <div className="mb-10 text-center md:mb-14">
             <span className="mb-4 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
               Who it&apos;s for
             </span>
@@ -486,8 +527,8 @@ export default function Home() {
               },
             ].map(item => (
               <div key={item.title} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#236470]/10">
-                  <item.icon className="h-5 w-5 text-[#236470]" />
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#297134]/10">
+                  <item.icon className="h-5 w-5 text-[#297134]" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">{item.title}</h3>
                 <p className="text-sm text-gray-500">{item.desc}</p>
@@ -498,7 +539,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="bg-gray-50 px-6 py-20">
+      <section id="pricing" className="bg-gray-50 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-3xl">
           <div className="mb-10 text-center">
             <span className="mb-4 inline-block rounded-full bg-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600">
@@ -507,7 +548,7 @@ export default function Home() {
             <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">Free, while we&apos;re early</h2>
             <p className="mx-auto max-w-xl text-gray-500">No credit card. No signup. Every check NameClaim runs is free during launch.</p>
           </div>
-          <div className="rounded-2xl border-2 border-[#236470] bg-white p-8 shadow-sm">
+          <div className="rounded-2xl border-2 border-[#297134] bg-white p-6 shadow-sm sm:p-8">
             <div className="mb-6 flex items-baseline gap-2">
               <span className="text-4xl font-bold text-gray-900">$0</span>
               <span className="text-gray-500">/ forever for early users</span>
@@ -522,14 +563,14 @@ export default function Home() {
                 'No account required',
               ].map(line => (
                 <li key={line} className="flex items-start gap-2 text-sm text-gray-700">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#236470]" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#297134]" />
                   {line}
                 </li>
               ))}
             </ul>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#236470] px-6 py-3 font-semibold text-white hover:bg-[#1a4d57] transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#297134] px-6 py-3 font-semibold text-white hover:bg-[#1f5527] transition-colors"
             >
               Start searching <ChevronRight className="h-4 w-4" />
             </button>
@@ -538,7 +579,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-white px-6 py-20">
+      <section id="faq" className="bg-white px-6 py-14 md:py-20">
         <div className="mx-auto max-w-3xl">
           <div className="mb-10 text-center">
             <span className="mb-4 inline-block rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-600">
@@ -586,10 +627,10 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="bg-black px-6 py-20">
+      <section className="bg-[#297134] px-6 py-14 md:py-20">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Ready to claim your business name?</h2>
-          <p className="mb-8 text-lg text-gray-400">Don&apos;t let someone else take your perfect name. Check availability now for free.</p>
+          <p className="mb-8 text-lg text-white">Don&apos;t let someone else take your perfect name. Check availability now for free.</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 font-semibold text-black hover:bg-gray-100 transition-colors"
@@ -600,19 +641,66 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white px-6 py-12">
+      <footer className="bg-[#121212] px-6 pt-14 pb-8 text-gray-400 md:pt-20">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-2">
-              <BinocularsLogo className="h-5 w-auto text-black" />
-              <span className="text-lg font-bold tracking-tight text-gray-900">nameclaim</span>
+          <div className="grid gap-8 md:grid-cols-4 md:gap-12">
+            {/* Brand column */}
+            <div>
+              <div className="mb-4 flex items-center gap-2">
+                <BinocularsLogo className="h-6 w-auto text-white" />
+                <span className="text-xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-wordmark)' }}>nameclaim</span>
+              </div>
+              <p className="text-sm leading-relaxed text-gray-500">
+                Brand availability,
+                <br />
+                checked in one search.
+              </p>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <a href="/privacy" className="hover:text-gray-900">Privacy Policy</a>
-              <a href="#" className="hover:text-gray-900">Terms of Service</a>
-              <a href="#" className="hover:text-gray-900">Contact</a>
+
+            {/* Product column */}
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500">
+                Product
+              </h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How it works</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#compare" className="hover:text-white transition-colors">Compare</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+              </ul>
             </div>
-            <p className="text-sm text-gray-400">© NameClaim</p>
+
+            {/* Legal column */}
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500">
+                Legal
+              </h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Affiliate disclosure</a></li>
+              </ul>
+            </div>
+
+            {/* Contact column */}
+            <div>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-500">
+                Contact
+              </h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <a href="mailto:support@nameclaim.xyz" className="hover:text-white transition-colors">
+                    support@nameclaim.xyz
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/5 pt-6 text-xs text-gray-500 md:mt-16 md:flex-row md:items-center md:justify-between">
+            <p>© 2026 NameClaim. All rights reserved.</p>
+            <p>Some outbound links are affiliate links — we may earn a commission at no extra cost to you.</p>
           </div>
         </div>
       </footer>

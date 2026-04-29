@@ -14,7 +14,7 @@ export default async function Image() {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          background: 'linear-gradient(180deg, #ffffff 0%, #B1D9ED 60%, #236470 100%)',
+          background: 'linear-gradient(180deg, #ffffff 0%, #B7DDC2 60%, #297134 100%)',
           padding: 88,
           fontFamily: 'system-ui, -apple-system, sans-serif',
         }}
@@ -26,7 +26,7 @@ export default async function Image() {
               width: 80,
               height: 80,
               borderRadius: 18,
-              background: '#236470',
+              background: '#297134',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

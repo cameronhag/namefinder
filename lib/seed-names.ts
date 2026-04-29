@@ -31,10 +31,7 @@ export const SEED_NAMES: string[] = [
 // Curated subset for the homepage "Try:" examples.
 // Pick names with different vibes to showcase the tool's range.
 export const HOMEPAGE_EXAMPLES: string[] = [
-  'Acme Solutions',
+  'Acme',
   'TechFlow',
   'GreenLeaf',
-  'Pinnacle Labs',
-  'Nexus AI',
-  'CloudSync',
 ]
