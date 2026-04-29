@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { SEED_NAMES } from '@/lib/seed-names'
 import { nameToSlug } from '@/lib/slug'
+import { getAllGuides } from '@/lib/guides'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://nameclaim.xyz'
@@ -19,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 
   const checkPages: MetadataRoute.Sitemap = SEED_NAMES.map(name => ({
@@ -28,5 +35,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  return [...staticPages, ...checkPages]
+  const guidePages: MetadataRoute.Sitemap = getAllGuides().map(g => ({
+    url: `${baseUrl}/guides/${g.slug}`,
+    lastModified: new Date(g.lastUpdated),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticPages, ...checkPages, ...guidePages]
 }
