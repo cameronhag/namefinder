@@ -7,6 +7,7 @@ export const contentType = 'image/png'
 
 const BRAND_GREEN = '#297134'
 const INK = '#0f172a'
+const ORIGIN = 'https://nameclaim.xyz'
 
 async function loadGoogleFont(family: string, weight: number) {
   const css = await fetch(
@@ -31,6 +32,19 @@ export default async function Image() {
     loadGoogleFont('Figtree', 700),
     loadGoogleFont('Space Grotesk', 700),
   ])
+
+  const pillStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    background: '#fff',
+    border: '1px solid #e5e7eb',
+    borderRadius: 999,
+    padding: '8px 16px',
+    fontSize: 16,
+    fontWeight: 500,
+    color: '#374151',
+  } as const
 
   return new ImageResponse(
     (
@@ -144,83 +158,25 @@ export default async function Image() {
 
           {/* Coverage pills */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
-            {/* Trademark */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 999,
-                padding: '8px 16px',
-                fontSize: 16,
-                fontWeight: 500,
-                color: '#374151',
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="11.25" fill="none" stroke={BRAND_GREEN} strokeWidth="1.5" />
-                <text
-                  x="12"
-                  y="12.5"
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize="11"
-                  fontWeight="700"
-                  fontFamily="Figtree"
-                  fill={BRAND_GREEN}
-                >
-                  TM
-                </text>
-              </svg>
+            <div style={pillStyle}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`${ORIGIN}/logos/uspto.png`} alt="" width={20} height={20} style={{ objectFit: 'contain' }} />
               Trademark
             </div>
-            {/* Domain */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 999,
-                padding: '8px 16px',
-                fontSize: 16,
-                fontWeight: 500,
-                color: '#374151',
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={BRAND_GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
+            <div style={pillStyle}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`${ORIGIN}/logos/namecheap.webp`} alt="" width={20} height={20} style={{ objectFit: 'contain' }} />
               Domain
             </div>
-            {/* Social */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 999,
-                padding: '8px 16px',
-                fontSize: 16,
-                fontWeight: 500,
-                color: '#374151',
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={BRAND_GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            <div style={pillStyle}>
+              <svg width="24" height="24" viewBox="0 0 48 48">
+                <path fill="#0288d1" d="M24 4A20 20 0 1 0 24 44A20 20 0 1 0 24 4Z" />
+                <path
+                  fill="#fff"
+                  d="M14 19H18V34H14zM15.988 17h-.022C14.772 17 14 16.11 14 14.999 14 13.864 14.796 13 16.011 13c1.217 0 1.966.864 1.989 1.999C18 16.11 17.228 17 15.988 17zM35 24.5c0-3.038-2.462-5.5-5.5-5.5-1.862 0-3.505.928-4.5 2.344V19h-4v15h4v-8c0-1.657 1.343-3 3-3s3 1.343 3 3v8h4C35 34 35 24.921 35 24.5z"
+                />
               </svg>
-              Social
+              Socials
             </div>
           </div>
 
@@ -242,7 +198,7 @@ export default async function Image() {
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
-              <span style={{ fontSize: 18, color: '#9ca3af' }}>Enter your business name</span>
+              <span style={{ fontSize: 18, color: INK }}>Acme Solutions</span>
             </div>
             <div
               style={{
@@ -278,7 +234,7 @@ export default async function Image() {
             </div>
           </div>
 
-          {/* Try row */}
+          {/* Try row + founders */}
           <div
             style={{
               display: 'flex',
@@ -309,17 +265,37 @@ export default async function Image() {
                 </div>
               ))}
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: '#fff',
-                letterSpacing: 1.4,
-                textTransform: 'uppercase',
-              }}
-            >
-              Used by founders like you
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex' }}>
+                {[1, 2, 3, 4].map((i, idx) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={i}
+                    src={`${ORIGIN}/founders/${i}.jpg`}
+                    alt=""
+                    width={26}
+                    height={26}
+                    style={{
+                      borderRadius: 999,
+                      objectFit: 'cover',
+                      marginLeft: idx === 0 ? 0 : -8,
+                      border: '1.5px solid rgba(255,255,255,0.4)',
+                    }}
+                  />
+                ))}
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#fff',
+                  letterSpacing: 1.4,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Used by founders like you
+              </span>
+            </div>
           </div>
         </div>
       </div>
