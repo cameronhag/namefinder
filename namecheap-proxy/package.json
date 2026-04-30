@@ -1,0 +1,17 @@
+{
+  "name": "namecheap-proxy",
+  "version": "1.0.0",
+  "description": "Static-IP proxy for Namecheap Domain API, deployed on Fly.io",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
