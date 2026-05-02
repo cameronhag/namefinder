@@ -734,8 +734,8 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
               </h4>
               <ul className="space-y-3 text-sm">
                 <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Affiliate disclosure</a></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+                <li><Link href="/affiliate-disclosure" className="hover:text-white transition-colors">Affiliate disclosure</Link></li>
               </ul>
             </div>
 

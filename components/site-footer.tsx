@@ -61,6 +61,16 @@ export function SiteFooter() {
                   Privacy
                 </Link>
               </li>
+              <li>
+                <Link href="/terms" className="transition-colors hover:text-white">
+                  Terms
+                </Link>
+              </li>
+              <li>
+                <Link href="/affiliate-disclosure" className="transition-colors hover:text-white">
+                  Affiliate disclosure
+                </Link>
+              </li>
             </ul>
           </div>
 
