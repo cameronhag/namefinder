@@ -172,7 +172,6 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
             <a href="#how-it-works" onClick={e => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
             <a href="#features" onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#compare" onClick={e => { e.preventDefault(); document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Compare</a>
-            <a href="#use-cases" onClick={e => { e.preventDefault(); document.getElementById('use-cases')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Use Cases</a>
             <a href="#faq" onClick={e => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }) }} className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
             <Link href="/guides" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Guides</Link>
             <div ref={supportRef} className="relative">
@@ -629,13 +628,7 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
                 a: 'We log searches anonymously for product analytics. We do not link them to identifiable users and we do not sell data to third parties. See our Privacy Policy for details.',
               },
             ].map(item => (
-              <details key={item.q} className="group rounded-xl border border-gray-200 bg-white p-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-gray-900">
-                  {item.q}
-                  <ChevronDown className="h-5 w-5 shrink-0 text-gray-400 transition-transform group-open:rotate-180" />
-                </summary>
-                <p className="mt-3 text-sm text-gray-600">{item.a}</p>
-              </details>
+              <FaqItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
         </div>
@@ -801,6 +794,33 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="flex w-full cursor-pointer items-center justify-between gap-4 p-5 text-left font-medium text-gray-900"
+      >
+        <span>{q}</span>
+        <ChevronDown
+          className={`h-5 w-5 shrink-0 text-gray-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+      >
+        <div className="overflow-hidden">
+          <p className="px-5 pb-5 text-sm text-gray-600">{a}</p>
+        </div>
+      </div>
     </div>
   )
 }

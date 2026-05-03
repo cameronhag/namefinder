@@ -11,7 +11,9 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
     if (!key) return
     posthog.init(key, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://t.nameclaim.xyz',
+      ui_host: 'https://us.posthog.com',
+      defaults: '2026-01-30',
       person_profiles: 'identified_only',
       capture_pageview: false, // we capture manually for App Router SPA nav
       capture_pageleave: true,
