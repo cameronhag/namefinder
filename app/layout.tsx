@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL('https://nameclaim.xyz'),
   title: {
-    default: 'NameClaim — Check business name availability across trademark, domain, and social',
+    default: 'Check business name availability across trademark, domain, and social',
     template: '%s | NameClaim',
   },
   description:
