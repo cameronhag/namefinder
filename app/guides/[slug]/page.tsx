@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote/rsc'
+import remarkGfm from 'remark-gfm'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { getAllGuides, getGuideBySlug } from '@/lib/guides'
@@ -116,7 +117,7 @@ export default async function GuidePage({
       <SiteHeader />
 
       <main className="flex-1">
-        <article className="mx-auto max-w-3xl px-6 py-14 md:py-20">
+        <article className="mx-auto max-w-3xl px-4 py-14 md:py-20">
           <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
             <Link href="/guides" className="hover:text-gray-900">
               Guides
@@ -134,7 +135,11 @@ export default async function GuidePage({
           </p>
 
           <div className="text-gray-700">
-            <MDXRemote source={guide.content} components={mdxComponents} />
+            <MDXRemote
+              source={guide.content}
+              components={mdxComponents}
+              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+            />
           </div>
         </article>
 

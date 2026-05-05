@@ -1,4 +1,5 @@
 import type { MDXComponents } from 'mdx/types'
+import Image from 'next/image'
 
 export const mdxComponents: MDXComponents = {
   h2: ({ children }) => (
@@ -54,9 +55,22 @@ export const mdxComponents: MDXComponents = {
     </pre>
   ),
   hr: () => <hr className="my-10 border-gray-200" />,
+  img: ({ src, alt }) => {
+    if (typeof src !== 'string') return null
+    return (
+      <Image
+        src={src}
+        alt={alt ?? ''}
+        width={0}
+        height={0}
+        sizes="(max-width: 768px) 100vw, 768px"
+        className="my-6 h-auto w-full rounded-lg"
+      />
+    )
+  },
   table: ({ children }) => (
-    <div className="my-6 overflow-x-auto rounded-lg border border-gray-200">
-      <table className="w-full text-sm">{children}</table>
+    <div className="my-6 -mx-4 overflow-x-auto rounded-lg border border-gray-200 sm:mx-0">
+      <table className="min-w-full text-sm">{children}</table>
     </div>
   ),
   th: ({ children }) => (
