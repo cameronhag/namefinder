@@ -339,6 +339,25 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
                 </div>
               </div>
             )}
+
+            {!loading && (
+              <div className="mt-6 flex justify-center">
+                <a
+                  href="https://www.scrolllaunch.com/products/nameclaim?utm_source=badge&utm_medium=embed&utm_campaign=nameclaim&ref=scrolllaunch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://www.scrolllaunch.com/api/badge/nameclaim"
+                    alt="Featured on ScrollLaunch"
+                    width={220}
+                    height={48}
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+            )}
           </div>
 
         </div>

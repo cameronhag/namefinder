@@ -37,16 +37,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: 'https://nameclaim.xyz',
-    title: 'NameClaim — Claim a name no one can take from you',
+    title: 'See if your business name is actually free — NameClaim',
     description:
-      'Trademark, domain, and social handle availability in one search. Free, ten seconds.',
+      'Check trademark, domain, and social handle availability for any business name in one search. Free, no signup, results in ten seconds.',
     siteName: 'NameClaim',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NameClaim — Claim a name no one can take from you',
+    title: 'See if your business name is actually free — NameClaim',
     description:
-      'Trademark, domain, and social handle availability in one search. Free, ten seconds.',
+      'Check trademark, domain, and social handle availability for any business name in one search. Free, no signup, results in ten seconds.',
   },
   alternates: {
     canonical: 'https://nameclaim.xyz',

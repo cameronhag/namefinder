@@ -7,7 +7,6 @@ export const contentType = 'image/png'
 
 const BRAND_GREEN = '#297134'
 const INK = '#0f172a'
-const ORIGIN = 'https://nameclaim.xyz'
 
 async function loadGoogleFont(family: string, weight: number) {
   const css = await fetch(
@@ -25,10 +24,7 @@ async function loadGoogleFont(family: string, weight: number) {
 }
 
 export default async function Image() {
-  const [figtree400, figtree500, figtree600, figtree700, spaceGrotesk700] = await Promise.all([
-    loadGoogleFont('Figtree', 400),
-    loadGoogleFont('Figtree', 500),
-    loadGoogleFont('Figtree', 600),
+  const [figtree700, spaceGrotesk700] = await Promise.all([
     loadGoogleFont('Figtree', 700),
     loadGoogleFont('Space Grotesk', 700),
   ])
@@ -42,7 +38,7 @@ export default async function Image() {
     borderRadius: 999,
     padding: '8px 16px',
     fontSize: 16,
-    fontWeight: 500,
+    fontWeight: 700,
     color: '#374151',
   } as const
 
@@ -85,29 +81,19 @@ export default async function Image() {
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
-            {['How It Works', 'Features', 'FAQ', 'Guides'].map(label => (
-              <span
-                key={label}
-                style={{ fontSize: 14, fontWeight: 500, color: '#4b5563' }}
-              >
-                {label}
-              </span>
-            ))}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: BRAND_GREEN,
-                color: '#fff',
-                fontSize: 14,
-                fontWeight: 600,
-                padding: '8px 18px',
-                borderRadius: 999,
-              }}
-            >
-              Sign Up
-            </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: BRAND_GREEN,
+              color: '#fff',
+              fontSize: 14,
+              fontWeight: 700,
+              padding: '8px 18px',
+              borderRadius: 999,
+            }}
+          >
+            Sign Up
           </div>
         </div>
 
@@ -128,7 +114,7 @@ export default async function Image() {
               background: 'rgba(41, 114, 52, 0.1)',
               color: '#1f2937',
               fontSize: 16,
-              fontWeight: 500,
+              fontWeight: 700,
               padding: '8px 18px',
               borderRadius: 999,
               marginBottom: 20,
@@ -159,22 +145,38 @@ export default async function Image() {
           {/* Coverage pills */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
             <div style={pillStyle}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${ORIGIN}/logos/uspto.png`} alt="" width={20} height={20} style={{ objectFit: 'contain' }} />
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="11.25" fill="none" stroke={BRAND_GREEN} strokeWidth="1.5" />
+                <text
+                  x="12"
+                  y="12.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="11"
+                  fontWeight="700"
+                  fontFamily="Figtree"
+                  fill={BRAND_GREEN}
+                >
+                  TM
+                </text>
+              </svg>
               Trademark
             </div>
             <div style={pillStyle}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${ORIGIN}/logos/namecheap.webp`} alt="" width={20} height={20} style={{ objectFit: 'contain' }} />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={BRAND_GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
               Domain
             </div>
             <div style={pillStyle}>
-              <svg width="24" height="24" viewBox="0 0 48 48">
-                <path fill="#0288d1" d="M24 4A20 20 0 1 0 24 44A20 20 0 1 0 24 4Z" />
-                <path
-                  fill="#fff"
-                  d="M14 19H18V34H14zM15.988 17h-.022C14.772 17 14 16.11 14 14.999 14 13.864 14.796 13 16.011 13c1.217 0 1.966.864 1.989 1.999C18 16.11 17.228 17 15.988 17zM35 24.5c0-3.038-2.462-5.5-5.5-5.5-1.862 0-3.505.928-4.5 2.344V19h-4v15h4v-8c0-1.657 1.343-3 3-3s3 1.343 3 3v8h4C35 34 35 24.921 35 24.5z"
-                />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={BRAND_GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
               </svg>
               Socials
             </div>
@@ -198,7 +200,7 @@ export default async function Image() {
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
-              <span style={{ fontSize: 18, color: INK }}>Acme Solutions</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: INK }}>Acme Solutions</span>
             </div>
             <div
               style={{
@@ -207,7 +209,7 @@ export default async function Image() {
                 gap: 8,
                 padding: '0 14px',
                 fontSize: 16,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: INK,
                 borderLeft: '1px solid #f1f5f9',
               }}
@@ -225,7 +227,7 @@ export default async function Image() {
                 background: BRAND_GREEN,
                 color: '#fff',
                 fontSize: 17,
-                fontWeight: 600,
+                fontWeight: 700,
                 padding: '14px 28px',
                 borderRadius: 999,
               }}
@@ -234,7 +236,7 @@ export default async function Image() {
             </div>
           </div>
 
-          {/* Try row + founders */}
+          {/* Try row */}
           <div
             style={{
               display: 'flex',
@@ -245,7 +247,7 @@ export default async function Image() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 16, fontWeight: 500, color: 'rgba(255,255,255,0.85)' }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
                 Try
               </span>
               {['Acme', 'TechFlow', 'GreenLeaf'].map(t => (
@@ -256,7 +258,7 @@ export default async function Image() {
                     background: 'rgba(255,255,255,0.2)',
                     color: '#fff',
                     fontSize: 14,
-                    fontWeight: 500,
+                    fontWeight: 700,
                     padding: '4px 12px',
                     borderRadius: 999,
                   }}
@@ -265,37 +267,17 @@ export default async function Image() {
                 </div>
               ))}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ display: 'flex' }}>
-                {[1, 2, 3, 4].map((i, idx) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={i}
-                    src={`${ORIGIN}/founders/${i}.jpg`}
-                    alt=""
-                    width={26}
-                    height={26}
-                    style={{
-                      borderRadius: 999,
-                      objectFit: 'cover',
-                      marginLeft: idx === 0 ? 0 : -8,
-                      border: '1.5px solid rgba(255,255,255,0.4)',
-                    }}
-                  />
-                ))}
-              </div>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: '#fff',
-                  letterSpacing: 1.4,
-                  textTransform: 'uppercase',
-                }}
-              >
-                Used by founders like you
-              </span>
-            </div>
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: '#fff',
+                letterSpacing: 1.4,
+                textTransform: 'uppercase',
+              }}
+            >
+              Used by founders like you
+            </span>
           </div>
         </div>
       </div>
@@ -303,9 +285,6 @@ export default async function Image() {
     {
       ...size,
       fonts: [
-        { name: 'Figtree', data: figtree400, weight: 400, style: 'normal' },
-        { name: 'Figtree', data: figtree500, weight: 500, style: 'normal' },
-        { name: 'Figtree', data: figtree600, weight: 600, style: 'normal' },
         { name: 'Figtree', data: figtree700, weight: 700, style: 'normal' },
         { name: 'Space Grotesk', data: spaceGrotesk700, weight: 700, style: 'normal' },
       ],
