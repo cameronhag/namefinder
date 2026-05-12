@@ -398,9 +398,6 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
       <section className="bg-gray-50 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center md:mb-14">
-            <span className="mb-4 inline-block text-sm font-bold uppercase tracking-widest text-[#297134]">
-              The cost of getting this wrong
-            </span>
             <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">A wrong name can cost you everything you build</h2>
             <p className="mx-auto max-w-2xl text-gray-500">Founders skip availability checks all the time, and it&apos;s usually a much bigger problem than they realize.</p>
           </div>
