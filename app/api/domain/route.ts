@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 type ProxyResponse = {
   domains?: Array<{
@@ -14,13 +15,11 @@ type ProxyResponse = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const raw = searchParams.get('domain')
-
-  if (!raw) {
-    return NextResponse.json({ error: 'Domain is required' }, { status: 400 })
+  const validation = validateName(searchParams.get('domain'))
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 })
   }
-
-  const domain = raw.toLowerCase().replace(/\s+/g, '')
+  const domain = validation.value.toLowerCase().replace(/\s+/g, '')
   const proxyUrl = process.env.NAMECHEAP_PROXY_URL
   const proxySecret = process.env.NAMECHEAP_PROXY_SECRET
 

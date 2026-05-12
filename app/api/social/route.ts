@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 type InstagramProfile = {
   username: string
@@ -144,14 +145,12 @@ async function checkViaHead(
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const raw = searchParams.get('name')
-
-  if (!raw) {
-    return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+  const validation = validateName(searchParams.get('name'))
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 })
   }
-
-  const noSpaces = raw.toLowerCase().replace(/\s+/g, '')
-  const withDashes = raw.toLowerCase().replace(/\s+/g, '-')
+  const noSpaces = validation.value.toLowerCase().replace(/\s+/g, '')
+  const withDashes = validation.value.toLowerCase().replace(/\s+/g, '-')
 
   const linkedinUrl = `https://www.linkedin.com/company/${withDashes}`
   const instagramUrl = `https://www.instagram.com/${noSpaces}/`
@@ -163,5 +162,5 @@ export async function GET(request: Request) {
     checkTikTok(noSpaces, tiktokUrl),
   ])
 
-  return NextResponse.json({ name: raw, results })
+  return NextResponse.json({ name: validation.value, results })
 }

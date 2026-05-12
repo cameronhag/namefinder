@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 type Platform = 'Instagram' | 'TikTok' | 'LinkedIn'
 
@@ -165,9 +166,13 @@ async function checkHandle(platform: Platform, handle: string): Promise<boolean>
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const rawName = searchParams.get('name') || ''
-    const rawCategory = searchParams.get('category') || ''
-    const platformsParam = searchParams.get('platforms') || 'Instagram,TikTok,LinkedIn'
+    const validation = validateName(searchParams.get('name'))
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+    const rawName = validation.value
+    const rawCategory = (searchParams.get('category') || '').slice(0, 100)
+    const platformsParam = (searchParams.get('platforms') || 'Instagram,TikTok,LinkedIn').slice(0, 200)
 
     const name = rawName.toLowerCase().replace(/[^a-z0-9]/g, '')
     if (!name) return NextResponse.json({ suggestions: {} })

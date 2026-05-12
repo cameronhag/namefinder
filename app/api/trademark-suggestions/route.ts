@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 interface BrandIdea {
   name: string
@@ -29,10 +30,12 @@ async function isTrademarkClear(candidate: string, origin: string): Promise<bool
 
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url)
-  const name = searchParams.get('name') ?? ''
-  const category = searchParams.get('category') ?? ''
-
-  if (!name) return NextResponse.json({ ideas: [] })
+  const validation = validateName(searchParams.get('name'))
+  if (!validation.ok) {
+    return NextResponse.json({ ideas: [] })
+  }
+  const name = validation.value
+  const category = (searchParams.get('category') ?? '').slice(0, 100)
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 interface Conflict {
   name: string
@@ -21,9 +22,11 @@ const cache = new Map<string, { value: TrademarkResult; expires: number }>()
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const name = searchParams.get('name')
-
-  if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+  const validation = validateName(searchParams.get('name'))
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 })
+  }
+  const name = validation.value
 
   const cacheKey = name.toLowerCase().trim()
   const cached = cache.get(cacheKey)

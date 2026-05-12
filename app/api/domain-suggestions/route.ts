@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { validateName } from '@/lib/validate'
 
 type RegisterAction = { type: string; name: string; url: string }
 
@@ -55,10 +56,13 @@ async function checkDomain(fqdn: string) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const rawName = searchParams.get('domain') || ''
-    const rawCategory = searchParams.get('category') || ''
+    const validation = validateName(searchParams.get('domain'))
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+    const rawCategory = (searchParams.get('category') || '').slice(0, 100)
 
-    const clean = rawName.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const clean = validation.value.toLowerCase().replace(/[^a-z0-9]/g, '')
     if (!clean) return NextResponse.json({ suggestions: [] })
 
     // Frontend sends full category strings like "Technology & Software"

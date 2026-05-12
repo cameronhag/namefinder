@@ -340,24 +340,6 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
               </div>
             )}
 
-            {!loading && (
-              <div className="mt-6 flex justify-center">
-                <a
-                  href="https://www.scrolllaunch.com/products/nameclaim?utm_source=badge&utm_medium=embed&utm_campaign=nameclaim&ref=scrolllaunch"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="https://www.scrolllaunch.com/api/badge/nameclaim"
-                    alt="Featured on ScrollLaunch"
-                    width={220}
-                    height={48}
-                    loading="lazy"
-                  />
-                </a>
-              </div>
-            )}
           </div>
 
         </div>
@@ -766,9 +748,24 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col gap-3 border-t border-white/5 pt-6 text-xs text-gray-500 md:mt-16 md:flex-row md:items-center md:justify-between">
+          <div className="mt-10 flex flex-col items-start gap-6 border-t border-white/5 pt-6 text-xs text-gray-500 md:mt-16 md:flex-row md:items-center md:justify-between">
             <p>© 2026 NameClaim. All rights reserved.</p>
-            <p>Some outbound links are affiliate links. We may earn a commission at no extra cost to you.</p>
+            <p className="max-w-md">Some outbound links are affiliate links. We may earn a commission at no extra cost to you.</p>
+            <a
+              href="https://www.scrolllaunch.com/products/nameclaim?utm_source=badge&utm_medium=embed&utm_campaign=nameclaim&ref=scrolllaunch"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-70 transition-opacity hover:opacity-100"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://www.scrolllaunch.com/api/badge/nameclaim"
+                alt="Featured on ScrollLaunch"
+                width={180}
+                height={40}
+                loading="lazy"
+              />
+            </a>
           </div>
         </div>
       </footer>
