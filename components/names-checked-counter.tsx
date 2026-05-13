@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react'
 
-export function NamesCheckedCounter() {
+function floorToPowerOfTen(count: number): number | null {
+  if (count < 100) return null
+  return Math.pow(10, Math.floor(Math.log10(count)))
+}
+
+export function NamesCheckedCounter({ fallback }: { fallback: string }) {
   const [count, setCount] = useState<number | null>(null)
 
   useEffect(() => {
@@ -15,22 +20,15 @@ export function NamesCheckedCounter() {
         }
       })
       .catch(() => {
-        // Counter is a nice-to-have. If it fails, render nothing.
+        // Counter is a nice-to-have. If it fails, render the fallback.
       })
     return () => {
       cancelled = true
     }
   }, [])
 
-  if (count === null) return null
+  const bucketed = count !== null ? floorToPowerOfTen(count) : null
+  if (bucketed === null) return <span>{fallback}</span>
 
-  return (
-    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white">
-      <span className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/70 opacity-75" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-      </span>
-      {count.toLocaleString('en-US')} names checked
-    </div>
-  )
+  return <span>{bucketed.toLocaleString('en-US')}+ names checked</span>
 }

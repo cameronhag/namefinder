@@ -235,7 +235,7 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
       >
         <div className="relative mx-auto max-w-4xl text-center">
           <span className="mb-6 inline-block rounded-full bg-[#297234]/10 px-4 py-1.5 text-sm font-medium text-gray-800">
-            Availability Checker
+            <NamesCheckedCounter fallback="Availability Checker" />
           </span>
           <h1 className="mx-auto mb-6 max-w-2xl text-balance text-4xl font-bold tracking-tight text-gray-900 md:text-6xl lg:text-6xl">
             See if your business name is actually free
@@ -339,7 +339,6 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
                   <span className="text-xs font-semibold uppercase tracking-wider text-white">
                     Used by founders like you
                   </span>
-                  <NamesCheckedCounter />
                 </div>
               </div>
             )}
