@@ -16,6 +16,9 @@ import { BinocularsLogo } from '@/components/binoculars-logo'
 import { CategoryDropdown } from '@/components/category-dropdown'
 import { FeedbackModal } from '@/components/feedback-modal'
 import { NameStatusCard } from '@/components/name-status-card'
+import { NamesCheckedCounter } from '@/components/names-checked-counter'
+import { FounderSliver } from '@/components/founder-sliver'
+import { Testimonials } from '@/components/testimonials'
 import type { GuideFrontmatter } from '@/lib/guides'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -336,6 +339,7 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
                   <span className="text-xs font-semibold uppercase tracking-wider text-white">
                     Used by founders like you
                   </span>
+                  <NamesCheckedCounter />
                 </div>
               </div>
             )}
@@ -550,6 +554,8 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
         </div>
       </section>
 
+      <Testimonials />
+
       {/* Pricing */}
       <section id="pricing" className="bg-gray-50 px-6 py-14 md:py-20">
         <div className="mx-auto max-w-3xl">
@@ -685,6 +691,8 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
           </button>
         </div>
       </section>
+
+      <FounderSliver />
 
       {/* Footer */}
       <footer className="bg-[#121212] px-6 pt-14 pb-8 text-gray-400 md:pt-20">

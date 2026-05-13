@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
 import { slugToName } from '@/lib/slug'
+import { incrementSearchCount } from '@/lib/stats'
 import ResultsPageWrapper, {
   type DomainApiResult,
   type TrademarkApiResult,
@@ -74,6 +75,10 @@ export default async function CheckPage({
 
     const [domain, trademark, social]: [DomainApiResult, TrademarkApiResult, SocialApiResult] =
       await Promise.all([domainRes.json(), trademarkRes.json(), socialRes.json()])
+
+    // Fire-and-forget: bump the all-time counter and per-slug popularity score.
+    // Failures in stats tracking must never block the render.
+    void incrementSearchCount(slug)
 
     return (
       <ResultsPageWrapper
