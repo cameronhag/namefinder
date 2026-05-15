@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import posthog from 'posthog-js'
 import { namecheapUrl } from '@/lib/affiliates'
+import { affiliateLinks } from '@/lib/affiliateLinks'
 import { nameToSlug } from '@/lib/slug'
 import { BinocularsLogo } from './binoculars-logo'
 import { CategoryDropdown } from './category-dropdown'
@@ -237,7 +238,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                 href={namecheapUrl(primary.domain)}
                 target="_blank"
                 rel="noopener sponsored"
-                className="text-xs text-[#297134] underline"
+                className="text-xs text-gray-500 underline"
                 onClick={() => posthog.capture('domain_register_clicked', {
                   name: primary.domain,
                   tld: primary.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -266,7 +267,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                     href={namecheapUrl(d.domain)}
                     target="_blank"
                     rel="noopener sponsored"
-                    className="text-xs text-[#297134] underline"
+                    className="text-xs text-gray-500 underline"
                     onClick={() => posthog.capture('domain_register_clicked', {
                       name: d.domain,
                       tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -295,7 +296,7 @@ function DomainCard({ results, showMore, onToggle, hasTrademarkConflict }: { res
                   href={namecheapUrl(d.domain)}
                   target="_blank"
                   rel="noopener sponsored"
-                  className="text-xs text-[#297134] underline"
+                  className="text-xs text-gray-500 underline"
                   onClick={() => posthog.capture('domain_register_clicked', {
                     name: d.domain,
                     tld: d.domain.match(/\.[a-z]+$/i)?.[0] ?? 'unknown',
@@ -338,19 +339,25 @@ function TrademarkCard({ data }: { data: TrademarkApiResult }) {
             <Check className="h-5 w-5 text-green-600" />
             <p className="font-[550] text-green-900">No conflicts found</p>
           </div>
-          <a
-            href="https://www.uspto.gov/trademarks/apply"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-sm text-green-700 hover:text-green-800 underline"
-          >
-            File a trademark <ExternalLink className="h-3 w-3" />
-          </a>
           {data.similarCount > 0 && (
-            <p className="mt-3 text-xs text-gray-500">
+            <p className="mt-2 text-xs text-gray-500">
               {data.similarCount}+ similar marks found (not exact matches)
             </p>
           )}
+          <p className="mt-3 text-xs text-green-900/80">
+            No federal trademark conflict, so {`"${data.name}"`} is yours to claim. The next step
+            for most founders is forming an LLC.
+          </p>
+          <a
+            href={affiliateLinks.bizee.url}
+            target="_blank"
+            rel="sponsored noopener"
+            className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#297134] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1f5527] transition-colors"
+            onClick={() => posthog.capture('llc_cta_clicked', { name: data.name, source: 'trademark_card', partner: 'bizee' })}
+          >
+            Form your LLC with Bizee <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+          <p className="mt-1.5 text-[11px] text-gray-400">{affiliateLinks.bizee.disclosure}</p>
         </div>
       </div>
     )

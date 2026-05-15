@@ -11,6 +11,7 @@ import {
 import Link from 'next/link'
 import posthog from 'posthog-js'
 import { nameToSlug } from '@/lib/slug'
+import { affiliateLinks } from '@/lib/affiliateLinks'
 import { HOMEPAGE_EXAMPLES } from '@/lib/seed-names'
 import { BinocularsLogo } from '@/components/binoculars-logo'
 import { CategoryDropdown } from '@/components/category-dropdown'
@@ -447,7 +448,7 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
               { icon: Zap, title: 'Lightning Fast', desc: 'Get results in seconds instead of spending hours manually checking each platform one by one.' },
-              { icon: Shield, title: 'Trademark Protection', desc: 'Avoid costly legal issues by checking trademark databases before you invest in your brand.' },
+              { icon: Shield, title: 'Trademark Protection', desc: 'Catch trademark conflicts before you invest in branding, domains, or LLC paperwork.' },
               { icon: Globe, title: 'Domain Coverage', desc: 'Check availability across all major TLDs including .com, .io, .co, .app, and more.' },
               { icon: AtSign, title: 'Social Media Handles', desc: 'Ensure consistent branding by checking handle availability on Instagram and TikTok.' },
               { icon: Clock, title: 'Save Time', desc: 'What used to take hours of research now takes seconds. Focus on building your business instead.' },
@@ -676,6 +677,78 @@ export function HomeClient({ guides }: { guides: GuideFrontmatter[] }) {
           </div>
         </section>
       )}
+
+      {/* Partners */}
+      <section id="partners" className="bg-white px-6 py-14 md:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center md:mb-12">
+            <span className="mb-4 inline-block text-sm font-bold uppercase tracking-widest text-[#297134]">
+              Partners
+            </span>
+            <h2 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">After you find a name</h2>
+            <p className="mx-auto max-w-2xl text-gray-500">
+              Two partners we trust for the next steps. Disclosure: we earn a commission if you use their services.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Bizee card */}
+            <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="mb-4 flex h-10 items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logos/bizee-logo.png"
+                  alt="Bizee"
+                  className="h-8 w-auto object-contain"
+                />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">Need to form an LLC?</h3>
+              <p className="mb-5 text-sm text-gray-500">
+                We work with Bizee, the most affordable LLC formation service we&apos;ve found. They&apos;ve helped over 200,000 entities get formed and your first year of registered agent service is free.
+              </p>
+              <div className="mt-auto">
+                <a
+                  href={affiliateLinks.bizee.url}
+                  target="_blank"
+                  rel="sponsored noopener"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#297134] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1f5527] transition-colors"
+                  onClick={() => posthog.capture('partner_cta_clicked', { partner: 'bizee', source: 'landing' })}
+                >
+                  Form your LLC with Bizee
+                </a>
+                <p className="mt-2 text-xs text-gray-400">{affiliateLinks.bizee.disclosure}</p>
+              </div>
+            </div>
+
+            {/* Namecheap card */}
+            <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="mb-4 flex h-10 items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logos/namecheaplogo.png"
+                  alt="Namecheap"
+                  className="h-8 w-auto object-contain"
+                />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">Need a domain?</h3>
+              <p className="mb-5 text-sm text-gray-500">
+                We recommend Namecheap for registering the domain you just claimed. They&apos;re cheaper than most registrars and don&apos;t upsell you into 12 add-ons at checkout.
+              </p>
+              <div className="mt-auto">
+                <a
+                  href={affiliateLinks.namecheap.url}
+                  target="_blank"
+                  rel="sponsored noopener"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#297134] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1f5527] transition-colors"
+                  onClick={() => posthog.capture('partner_cta_clicked', { partner: 'namecheap', source: 'landing' })}
+                >
+                  Register your domain on Namecheap
+                </a>
+                <p className="mt-2 text-xs text-gray-400">{affiliateLinks.namecheap.disclosure}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="bg-[#297134] px-6 py-14 md:py-20">
